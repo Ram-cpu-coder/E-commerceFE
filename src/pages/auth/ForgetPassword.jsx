@@ -15,6 +15,7 @@ const ForgetPassword = () => {
 
   const { form, handleOnChange, setForm } = useform({
     email: "",
+    Otp: "",
     password: "",
     confirmPassword: "",
   });

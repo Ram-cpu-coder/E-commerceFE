@@ -41,21 +41,23 @@ export const verifyEmailAndSendOTPApi = (email) => {
 export const verifyOTPApi = ({ Otp, email }) => {
   return apiProcessor({
     method: "post",
-    url: `${rootUrl}/verify-user/verify-otp`,
-    data: { Otp: Otp, email: email },
+    url: rootUrl + "/verify-user/verify-otp",
+    data: {
+      Otp: String(Otp),
+      email,
+    },
   });
 };
 
-// Update Password api
 export const updatePwApi = ({ email, Otp, password, confirmPassword }) => {
   return apiProcessor({
     method: "post",
     url: rootUrl + "/verify-user",
     data: {
-      email: email,
-      Otp: Otp,
-      password: password,
-      confirmPassword: confirmPassword,
+      email,
+      Otp: String(Otp),
+      password,
+      confirmPassword,
     },
   });
 };

@@ -100,25 +100,35 @@ export const verifyOTP = ({ email, Otp }) =>
 // Update Password action
 export const updatePwAction = ({ email, Otp, password, confirmPassword }) =>
   async (dispatch) => {
-    const pending = updatePwApi({ email, Otp, password, confirmPassword });
+    const pending = updatePwApi({
+      email,
+      Otp: String(Otp),
+      password,
+      confirmPassword,
+    });
+
     toast.promise(pending, {
       pending: "Updating Password!",
     });
 
     const { status, message, updatedUser } = await pending;
     toast[status](message);
-    console.log(status, "status");
+
     if (status === "success") {
-      const obj = {
-        userDetail: {
-          userId: updatedUser._id,
-          userName: updatedUser.fName + updatedUser.lName
-        },
-        action: "userUpdated",
-        entityId: updatedUser._id,
-        entityType: "user"
+      if (updatedUser?._id) {
+        const obj = {
+          userDetail: {
+            userId: updatedUser._id,
+            userName: updatedUser.fName + updatedUser.lName,
+          },
+          action: "userUpdated",
+          entityId: updatedUser._id,
+          entityType: "user",
+        };
+
+        dispatch(createRecentActivity(obj));
       }
-      dispatch(createRecentActivity(obj))
+
       return true;
     }
   };

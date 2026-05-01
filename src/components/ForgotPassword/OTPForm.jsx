@@ -16,43 +16,53 @@ const OTPForm = ({
 }) => {
   const dispatch = useDispatch();
   const [isOTP, setIsOTP] = useState(false);
+
   const handleOnOTPSubmit = async (e) => {
     e.preventDefault();
+
     const response = await dispatch(
-      verifyOTP({ Otp: form.Otp, email: form.email })
+      verifyOTP({
+        Otp: String(form.Otp),
+        email: form.email,
+      }),
     );
+
     if (response === true) {
       setIsOTP(true);
       setIsPassword(true);
       setHeading("Enter your password...");
     }
   };
+
   const handleOnChange = (otpValue) => {
     setForm((prev) => ({
       ...prev,
-      Otp: Number(otpValue),
+      Otp: otpValue,
     }));
   };
+
   const handleOnEmailSubmit = async () => {
     setIsOTP(false);
-    form.Otp = "";
+
+    setForm((prev) => ({
+      ...prev,
+      Otp: "",
+    }));
+
     await dispatch(verifyEmailAndSendOTPAction({ email: form.email }));
   };
 
   return (
     isVerifyOtpUI && (
       <div className="d-flex flex-column">
-        <div className="d-flex  gap-3 mb-2">
+        <div className="d-flex gap-3 mb-2">
           <OTPInput
-            value={form.Otp}
-            // name="otp"
+            value={form.Otp || ""}
             inputType="number"
             onChange={handleOnChange}
             numInputs={6}
             renderSeparator={<span></span>}
-            renderInput={(props) => (
-              <input {...props} disabled={isOTP ? true : false} />
-            )}
+            renderInput={(props) => <input {...props} disabled={isOTP} />}
             inputStyle={{
               width: "2.5rem",
               height: "2.5rem",
@@ -66,15 +76,17 @@ const OTPForm = ({
               outline: "none",
             }}
           />
+
           <Button
             variant="primary"
-            disabled={isOTP ? true : false}
+            disabled={isOTP || String(form.Otp || "").length !== 6}
             onClick={handleOnOTPSubmit}
             style={{ height: "2.5rem", width: "110px" }}
           >
             Verify OTP
           </Button>
         </div>
+
         <p className="px-2">
           Didn't get OTP?{" "}
           <Button onClick={handleOnEmailSubmit} variant="link">
