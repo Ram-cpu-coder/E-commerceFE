@@ -1,0 +1,329 @@
+/* donot remove it, this one is for carousel home page  */
+:root{
+  --swiper-navigation-size : 20px
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.login-page {
+  min-height: 100vh;
+}
+/* ==================================================================== */
+/* category landing page  */
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-item {
+  cursor: pointer;
+}
+/* carousel home page */
+/* ==================================================================== */
+#app {
+  height: 100%;
+}
+html,
+body,#root {
+  position: relative;
+  height: 100%;
+  background: white;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #000;
+  margin: 0;
+  padding: 0;
+}
+.logo{
+height: 65px; 
+width: 170px;
+
+}
+/* ------------------------------------------------------------------------- */
+.carouselDiv{
+  height: "70vh"; 
+  background: "white";
+  aspect-ratio: 16/5;
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #fff;
+
+  /* Center slide text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.swiper {
+  margin-left: auto;
+  margin-right: auto;
+}
+/* 
+.swiper-button-prev, .swiper-button-next{
+  display: none;
+} */
+/* ==================================================================== */
+/* carousel home page end  */
+/* ==================================================================== */
+
+
+.productImg{
+ max-height: 100%;
+ max-width: 100%;
+ aspect-ratio: 10/5;
+ object-fit: contain;
+ padding: 1.5rem;
+ transition: opacity 0.3s ease-in-out;
+/* filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5)); */
+}
+/* ==================================================================== */
+/* cart */
+.cart-animation-open {
+  animation: slideIn 0.5s ease forwards;
+}
+
+.cart-animation-close {
+  animation: slideOut 0.5s ease forwards;
+}
+/* ==================================================================== */
+/* update box glassmophormism */
+.updateBox {
+  margin: 0 auto;
+  width: 16rem;
+  height: 20rem;
+  background: rgba(255, 255, 255, 0954);
+  border: 1px solid black;
+  backdrop-filter: blur(8px);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+/* ==================================================================== */
+/* sticky class for the product landing page */
+
+@media (min-width : 768px){
+  .sticky-element{
+  position: sticky;
+  top: 80px;
+  }
+}
+@media (max-width : 767px){
+  .sticky-element{
+  position: static;
+  }
+   .heightForSmallScreen{
+  min-height: 100px !important;
+  }
+  .shareButton{
+    top: 0% !important;
+    } 
+}
+/* ==================================================================== */
+
+/* sharing social links */
+.social-icon{
+  background: transparent !important;
+  margin: 2px 5px;
+}
+/* ==================================================================== */
+/* about page */
+
+
+/* Section Styling */
+section.about-section {
+  background-color: #f8f9fa;
+  padding: 4rem 0;
+  color: #212529;
+}
+
+/* Headings */
+.about-section h1,
+.about-section h2,
+.about-section h3,
+.about-section h5 {
+  font-weight: 700;
+  color: #111;
+}
+
+/* Paragraphs */
+.about-section p {
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Buttons */
+.about-section .btn-dark {
+  background-color: #000;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.about-section .btn-dark:hover {
+  background-color: #333;
+}
+
+/* Team Image Styling */
+.about-team img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 4px solid #ddd;
+  transition: transform 0.3s ease;
+}
+
+.about-team img:hover {
+  transform: scale(1.05);
+}
+
+/* Values Cards */
+.about-values h5 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.about-values p {
+  font-size: 0.9rem;
+}
+
+/* Responsive Spacing */
+@media (max-width: 768px) {
+  .about-section {
+    padding: 2rem 1rem;
+  }
+
+  .about-values .col-md-3,
+  .about-team .col-md-4 {
+    margin-bottom: 1.5rem;
+  }
+}
+/* ==================================================================== */
+/* search page */
+.searchContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: start;
+  min-height: 80dvh;
+
+  animation: slideDown 0.3s ease-out forwards;
+
+  input {
+    height: 60px;
+    width: 500px;
+    padding: 0 10px;
+    border: 2px solid #6c757d;
+    border-radius: 10px;
+    font-size: 25px;
+    transition: height 0.3s ease;
+  }
+
+  .icon {
+    font-size: 60px;
+    color: #6c757d;
+    transition: all 0.3s ease;
+  }
+}
+  .liveSearch{
+    margin-top: 2%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    animation: slideUp 0.3s ease-out forwards;
+    
+    input {
+      height: 50px;
+      width: 400px;
+      border-radius: 5px;
+      padding: 0 10px;
+      font-size: 20px;
+      transition: height 0.3s ease;
+      
+    }
+
+    .icon {
+      font-size: 50px;
+      animation: slideSearchIcon 0.3s ease-out forwards;
+    }
+  }
+@keyframes slideSearchIcon {
+  0%{
+opacity: 0;
+width: 0;
+  }
+  100%{
+opacity: 1;
+width: 50px;
+  }
+}
+
+@keyframes slideDown {
+    0%{
+      opacity: 0;
+        transform: translateY(0%);
+    }
+    100%{
+      opacity: 1;
+        transform: translateY(50%);
+    }
+  }
+  @keyframes slideUp {
+    0%{
+      opacity: 0;
+        transform: translateY(500%);
+    }
+    100%{
+      opacity: 1;
+        transform: translateY(0%);
+    }
+  }
+  /* ==================================================================== */
+  /* product Card */
+.hoverCart:hover{
+   color: white !important;
+   background: black !important;
+   }
+  /* ==================================================================== */

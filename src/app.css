@@ -1,0 +1,38 @@
+.fab-container {
+  position: relative;
+  min-width: 24%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.left {
+  width: 40%;
+}
+
+.fab-btn {
+  position: absolute;
+  top: -25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #00000060;
+  padding: 15px;
+  border-radius: 50%;
+  backdrop-filter: blur(5px);
+}
+
+/* accordion css */
+/* hiding the built in dropdown */
+.accordion-button::after{
+  display: none;
+}
+.accordion-header{
+  margin-left: 0px;
+}
+.rotate-180 {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
