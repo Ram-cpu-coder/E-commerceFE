@@ -53,6 +53,7 @@ export const registerUserAction = (registerObj) => async (dispatch) => {
       entityId: user._id,
       entityType: "user"
     }
+    toast.success(message)
     dispatch(createRecentActivity(obj))
   } else {
     toast.error(message)
