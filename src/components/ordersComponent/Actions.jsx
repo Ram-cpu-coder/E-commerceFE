@@ -1,28 +1,25 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { deleteOrderAction } from "../../features/orders/orderActions";
 import { generateInvoice } from "../../features/invoice/invoiceApi";
 
-const Actions = ({ item, user }) => {
+const Actions = ({ item }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // deleting the order
   const handleOnCancelOrder = (_id) => {
     dispatch(deleteOrderAction(_id));
   };
 
-  // invoice
   const handleOnInvoice = async (id) => {
     try {
       const response = await generateInvoice(id);
-      console.log(response);
       const blob = new Blob([response], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
     } catch (error) {
-      console.log(error?.message);
+      console.error(error?.message);
     }
   };
 
@@ -33,26 +30,28 @@ const Actions = ({ item, user }) => {
     >
       <p className="d-flex flex-column w-75" style={{ height: "auto" }}>
         $ {item.totalAmount}
-        {/* shipping address and its editing*/}
         <span className="mb-0 ">
           <b>Shipping to: </b>
           {item.shippingAddress} &nbsp;
           {item.status === "pending" || item.status === "confirmed" ? (
-            <a href="" onClick={() => navigate(`/user/address/${item._id}`)}>
-              Change
-            </a>
+            <Link to={`/user/address/${item._id}`}>Change</Link>
           ) : (
             ""
           )}
-          &nbsp; &nbsp;<a href={`/user/orders/${item._id}`}>Track Order</a>
+          &nbsp; &nbsp;
+          <Link to={`/user/orders/${item._id}`}>Track Order</Link>
         </span>
       </p>
-      {/* buttons in accordion header */}
       <div className="d-flex gap-2 text-decoration-underline">
         <div
           onClick={() => handleOnInvoice(item._id)}
           title="Invoice"
           className=" text-primary"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) =>
+            e.key === "Enter" && handleOnInvoice(item._id)
+          }
         >
           Invoice
         </div>
@@ -60,6 +59,11 @@ const Actions = ({ item, user }) => {
           className="text-danger"
           onClick={() => handleOnCancelOrder(item._id)}
           title="Cancel"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) =>
+            e.key === "Enter" && handleOnCancelOrder(item._id)
+          }
         >
           Cancel
         </div>

@@ -2,6 +2,8 @@ import axios from "axios";
 
 const authEp = import.meta.env.VITE_BACKEND_BASE_URL + "/auth";
 
+const CACHE_TTL_MS = 60_000;
+
 let isRefreshing = false;
 let refreshPromise = null;
 export const apiCache = new Map();
@@ -17,6 +19,16 @@ export const clearApiCache = (url) => {
 const getAccessJWT = () => sessionStorage.getItem("accessJWT");
 const getRefreshJWT = () => localStorage.getItem("refreshJWT");
 
+const getCachedPayload = (url) => {
+  const entry = apiCache.get(url);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > CACHE_TTL_MS) {
+    apiCache.delete(url);
+    return null;
+  }
+  return entry.data;
+};
+
 export const apiProcessor = async ({
   method,
   url,
@@ -26,9 +38,9 @@ export const apiProcessor = async ({
   contentType = "application/json",
   responseType = undefined,
 }) => {
-  // 1. Quick cache layer for public GETs
-  if (method === "get" && !isPrivate && !isRefreshToken && apiCache.has(url)) {
-    return apiCache.get(url);
+  if (method === "get" && !isPrivate && !isRefreshToken) {
+    const cached = getCachedPayload(url);
+    if (cached !== null) return cached;
   }
 
   const headers = {};
@@ -49,7 +61,7 @@ export const apiProcessor = async ({
     const response = await axios({ method, url, data, headers, responseType });
 
     if (method === "get" && !isPrivate && !isRefreshToken) {
-      apiCache.set(url, response.data); // cache result
+      apiCache.set(url, { data: response.data, ts: Date.now() });
     }
 
     return response.data;
@@ -57,8 +69,11 @@ export const apiProcessor = async ({
     const status = error?.response?.status;
     const errorMsg = error?.response?.data?.message || error.message;
 
-    // 2. Handle token expiry
-    if ((status === 401 || errorMsg === "jwt expired") && !isRefreshToken && isPrivate) {
+    if (
+      (status === 401 || errorMsg === "jwt expired") &&
+      !isRefreshToken &&
+      isPrivate
+    ) {
       if (!isRefreshing) {
         isRefreshing = true;
         refreshPromise = (async () => {
@@ -73,9 +88,8 @@ export const apiProcessor = async ({
             if (refreshData?.accessToken) {
               sessionStorage.setItem("accessJWT", refreshData.accessToken);
               return refreshData;
-            } else {
-              throw new Error("Invalid refresh response");
             }
+            throw new Error("Invalid refresh response");
           } catch (refreshError) {
             console.warn("Token refresh failed:", refreshError.message);
             sessionStorage.removeItem("accessJWT");
@@ -98,9 +112,11 @@ export const apiProcessor = async ({
           contentType,
           responseType,
         });
-      } else {
-        return { status: "error", message: "Session expired. Please log in again." };
       }
+      return {
+        status: "error",
+        message: "Session expired. Please log in again.",
+      };
     }
 
     return { status: "error", message: errorMsg };

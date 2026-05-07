@@ -42,6 +42,15 @@ const ProductLandingPage = () => {
 
   const favourite = wishlist?.some((item) => item.productId === id);
 
+  useEffect(() => {
+    if (!selectedProduct?.name || selectedProduct._id !== id) return;
+    const prev = document.title;
+    document.title = `${selectedProduct.name} | Ecommerce platform`;
+    return () => {
+      document.title = prev;
+    };
+  }, [id, selectedProduct?._id, selectedProduct?.name]);
+
   // --- Fetch product, reviews, wishlist once ---
   useEffect(() => {
     let isMounted = true; // prevent state updates if component unmounts

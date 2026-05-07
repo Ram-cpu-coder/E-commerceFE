@@ -39,8 +39,6 @@ const SearchPage = () => {
     );
     setDisplayProducts(data);
   };
-  console.log(allActiveProducts, 87);
-
   const handleClearSearch = () => {
     setIsSearching(false);
     setCloseIcon(false);

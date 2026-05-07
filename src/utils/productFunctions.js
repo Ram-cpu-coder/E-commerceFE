@@ -12,5 +12,5 @@ export const handleOnClickProduct = async (item, user, dispatch) => {
     });
     await dispatch(getSingleProductAction(item._id));
     await dispatch(getPubReviewAction());
-    window.location.href = `/${item._id}`;
+    window.location.href = `/product/${item._id}`;
 };

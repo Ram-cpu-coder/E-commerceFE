@@ -59,7 +59,7 @@ const CarouselLandingPage = () => {
                       action: "click",
                     })
                   );
-                  window.location.href = `/${item._id}`;
+                  window.location.href = `/product/${item._id}`;
                 }}
               >
                 <ProductCard item={item} />

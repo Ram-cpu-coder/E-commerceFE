@@ -1,12 +1,11 @@
 import { Suspense, lazy } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useParams } from "react-router-dom";
 
-// Critical components – load immediately
 import DefaultLayout from "../components/layouts/DefaultLayout";
 import HomePage from "../pages/home/HomePage";
 import { useSelector } from "react-redux";
+import RouteFallback from "../components/RouteFallback.jsx";
 
-// Lazy-load everything else – only when needed
 const Register = lazy(() => import("../pages/auth/Register"));
 const ForgetPassword = lazy(() => import("../pages/auth/ForgetPassword"));
 const Login = lazy(() => import("../pages/auth/Login"));
@@ -63,9 +62,14 @@ const ProtectedRoutes = ({ isAuth, children }) => {
   return isAuth ? children : <Navigate to="/login" replace />;
 };
 
-// const AdminRoute = ({ isAdmin, children }) => {
-//   return isAdmin ? children : <Navigate to="/login" replace />;
-// };
+/** Old app used `/:mongoId` for products; redirect to `/product/:id`. */
+const LegacyProductRedirect = () => {
+  const { legacyId } = useParams();
+  if (/^[a-f0-9]{24}$/i.test(legacyId)) {
+    return <Navigate to={`/product/${legacyId}`} replace />;
+  }
+  return <Navigate to="/" replace />;
+};
 
 const AdminRoute = ({ children }) => {
   const { user } = useSelector((state) => state.userInfo);
@@ -75,25 +79,22 @@ const AdminRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // wait until user object is loaded
   if (!user || !Object.keys(user).length) {
-    return <div>Loading...</div>;
+    return <RouteFallback />;
   }
 
   return user.role === "admin" ? children : <Navigate to="/login" replace />;
 };
+
 const AppRoutes = () => {
   const { user } = useSelector((state) => state.userInfo);
-  console.log(user, 8888);
   const accessJWT = sessionStorage.getItem("accessJWT");
 
   const isAuthenticated = !!accessJWT;
-  const isAdmin = !!accessJWT && user.role === "admin";
-  console.log(isAdmin, isAuthenticated);
+
   return (
-    <Suspense fallback={<div>Loading .... </div>}>
+    <Suspense fallback={<RouteFallback />}>
       <Routes>
-        {/* public routes */}
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/shop" element={<Shop />} />
@@ -102,14 +103,14 @@ const AppRoutes = () => {
           <Route path="/forgetpassword" element={<ForgetPassword />} />
           <Route path="/category/:categoryName" element={<CategoryLanding />} />
           <Route path="/verify-user" element={<VerifyUser />} />
-          <Route path="/:id" element={<ProductLandingPage />} />
+          <Route path="/product/:id" element={<ProductLandingPage />} />
           <Route path="/payment-result" element={<PaymentResult />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/featured/:id" element={<CarouselLandingPage />} />
+          <Route path="/:legacyId" element={<LegacyProductRedirect />} />
         </Route>
-        {/* private routes */}
         <Route
           path="/user"
           element={
@@ -129,11 +130,10 @@ const AppRoutes = () => {
           <Route path="wishlist" element={<WishList />} />
           <Route path="orders/:id" element={<OrderLandingPage />} />
         </Route>
-        {/* admin routes */}
         <Route
           path="/admin"
           element={
-            <AdminRoute isAdmin={isAdmin}>
+            <AdminRoute>
               <DefaultLayout />
             </AdminRoute>
           }

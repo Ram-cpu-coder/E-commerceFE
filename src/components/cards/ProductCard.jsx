@@ -51,7 +51,7 @@ const ProductCard = ({ item }) => {
     }
   }, [avgRating, ttlRatings, _id, dispatch, user]);
 
-  const handleProductClick = () => navigate(`/${_id}`);
+  const handleProductClick = () => navigate(`/product/${_id}`);
 
   const handleAddToCart = (e) => {
     e.stopPropagation();

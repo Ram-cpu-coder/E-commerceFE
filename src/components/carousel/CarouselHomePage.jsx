@@ -21,7 +21,7 @@ export default function CarouselHomePage({ featureBanner }) {
   const navigate = useNavigate();
 
   const handleBannerLandingPage = (id) => {
-    navigate(`featured/${id}`);
+    navigate(`/featured/${id}`);
   };
 
   if (!featureBanner || featureBanner.length === 0) return null;

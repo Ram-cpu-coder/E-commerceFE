@@ -131,7 +131,7 @@ const CategoryLanding = () => {
             <Col xs={6} md={4} lg={3} key={index}>
               <Link
                 className="text-decoration-none text-dark"
-                to={`/${item._id}`}
+                to={`/product/${item._id}`}
               >
                 <ProductCard item={item} />
               </Link>
