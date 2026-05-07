@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Navbar, Container, Nav, Form } from "react-bootstrap";
+import { Navbar, Container, Nav } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import BottomNavBar from "./BottomNavBar";
@@ -23,58 +23,56 @@ const Header = ({ handleCart, setNavHeight }) => {
 
   useEffect(() => {
     const updateHeight = () => {
-      setNavHeight(navRef.current.offsetHeight);
+      if (navRef.current) {
+        setNavHeight(navRef.current.offsetHeight);
+      }
     };
     updateHeight();
     window.addEventListener("resize", updateHeight);
     return () => window.removeEventListener("resize", updateHeight);
-  }, []);
+  }, [setNavHeight]);
 
   return (
     <Navbar
       expand="lg"
       expanded={expanded}
       onToggle={() => setExpanded((prev) => !prev)}
-      className="bg-body-tertiary w-100 sticky-top"
+      className="app-navbar bg-body-tertiary w-100 sticky-top"
       ref={navRef}
     >
       <Container>
-        {/* Left-aligned links (Shop, About) - Hidden on mobile */}
         <Navbar.Collapse id="navbar-left" className="order-1 order-lg-0">
-          <Nav>
-            <a href="/shop" className="px-3 nav-link">
-              SHOP
-            </a>
-            <a href="/about" className="px-3 nav-link">
-              ABOUT
-            </a>
-            <a href="/user/wishlist" className="px-3 nav-link">
-              WISHLIST
-            </a>
+          <Nav className="align-items-lg-center">
+            <Link to="/shop" className="px-3 py-2 nav-link nav-link-app">
+              Shop
+            </Link>
+            <Link to="/about" className="px-3 py-2 nav-link nav-link-app">
+              About
+            </Link>
+            <Link to="/user/wishlist" className="px-3 py-2 nav-link nav-link-app">
+              Wishlist
+            </Link>
           </Nav>
         </Navbar.Collapse>
 
-        {/* Brand (Centered) */}
-        <Navbar.Brand
-          onClick={() => (window.location.href = "/")}
-          className=" fs-1 fw-bold order-0"
-          style={{ cursor: "pointer" }}
-        >
-          <picture>
-            <source srcSet="/Logo.png" type="image/webp" className="logo" />
-            <source srcSet="/Logo.png" type="image/jpeg" className="logo" />
-            <img src="/Logo.png" alt="Logo" className="logo" />
-          </picture>
+        <Navbar.Brand className="fs-4 fw-bold order-0 mx-lg-4 py-0">
+          <Link to="/" className="d-inline-block text-decoration-none">
+            <picture>
+              <source srcSet="/Logo.png" type="image/webp" />
+              <img src="/Logo.png" alt="NepaStore home" className="logo" />
+            </picture>
+          </Link>
         </Navbar.Brand>
 
         <div id="navbar-search-mobile" className="d-block d-md-none">
           <Nav className="ms-auto">
-            {/*  changed to button as we are expecting the div for cart to be rendered above the current page, as we are not navigating to another separate page acc to the figma design */}
             <button
-              className="text-center nav-link fs-3 position-relative"
+              type="button"
+              className="text-center nav-link fs-3 position-relative border-0 bg-transparent"
               onClick={handleInternalChange}
+              aria-label={`Open cart, ${cart?.length || 0} items`}
             >
-              <MdOutlineShoppingCart />
+              <MdOutlineShoppingCart aria-hidden />
               <span
                 className="position-absolute start-100 translate-middle badge rounded-circle bg-danger text-white"
                 style={{
@@ -93,38 +91,40 @@ const Header = ({ handleCart, setNavHeight }) => {
           </Nav>
         </div>
 
-        {/* Toggle button (for mobile) */}
         <Navbar.Toggle
           aria-controls="navbar-left navbar-right"
           className="order-0 ms-auto d-none d-md-block d-lg-none"
         />
 
-        {/* Right-aligned links (Wishlist, Search, Cart) - Hidden on mobile */}
         <Navbar.Collapse id="navbar-right" className="order-3 order-lg-0">
-          <Nav className="ms-auto">
-            {user && user.role === "admin" ? (
-              <a href="/admin/adminDashboard" className="px-3 nav-link">
-                DASHBOARD
-              </a>
-            ) : (
-              <a href="/user/account" className="px-3 nav-link">
-                ACCOUNT
-              </a>
-            )}
-            <button
-              className="px-3 text-start nav-link"
-              onClick={handleInternalChange}
-            >
-              CART
-            </button>
-
-            {user._id ? (
-              <Link to="/user/logout" className="px-3 nav-link">
-                LOG OUT
+          <Nav className="ms-auto align-items-lg-center">
+            {user?.role === "admin" ? (
+              <Link
+                to="/admin/adminDashboard"
+                className="px-3 py-2 nav-link nav-link-app"
+              >
+                Dashboard
               </Link>
             ) : (
-              <Link to="/login" className="px-3 nav-link">
-                LOG IN
+              <Link to="/user/account" className="px-3 py-2 nav-link nav-link-app">
+                Account
+              </Link>
+            )}
+            <button
+              type="button"
+              className="px-3 py-2 text-start nav-link nav-link-app border-0 bg-transparent"
+              onClick={handleInternalChange}
+            >
+              Cart
+            </button>
+
+            {user?._id ? (
+              <Link to="/user/logout" className="px-3 py-2 nav-link nav-link-app">
+                Log out
+              </Link>
+            ) : (
+              <Link to="/login" className="px-3 py-2 nav-link nav-link-app">
+                Log in
               </Link>
             )}
           </Nav>

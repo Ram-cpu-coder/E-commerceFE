@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   FaHome,
   FaStore,
@@ -7,60 +7,56 @@ import {
   FaSignInAlt,
 } from "react-icons/fa";
 import { RiAccountCircleFill } from "react-icons/ri";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchUserAction } from "../../features/user/userAction";
+import { Link } from "react-router-dom";
 
 const BottomNavBar = ({ handleCart, user }) => {
-  // const dispatch = useDispatch();
-  // const { user } = useSelector((state) => state.userInfo);
-  // console.log(user);
-  // useEffect(() => {
-  //   dispatch(fetchUserAction());
-  // }, []);
   return (
     <nav
-      className="fixed-bottom d-flex justify-content-between bg-light d-md-none"
+      className="bottom-nav-app fixed-bottom d-flex justify-content-between d-md-none border-top"
       style={{ height: "70px" }}
+      aria-label="Mobile navigation"
     >
-      {/* left */}
-      <div className="d-flex justify-content-around align-items-center left gap-0 ">
-        <a href="/" className="text-center nav-link">
-          <FaHome size={20} />
+      <div className="d-flex justify-content-around align-items-center left gap-0">
+        <Link to="/" className="text-center nav-link py-2">
+          <FaHome size={20} aria-hidden />
           <div>Home</div>
-        </a>
-        <a href="/shop" className="text-center nav-link">
-          <FaStore size={20} />
+        </Link>
+        <Link to="/shop" className="text-center nav-link py-2">
+          <FaStore size={20} aria-hidden />
           <div>Shop</div>
-        </a>
+        </Link>
       </div>
 
-      {/* FAB Notch */}
-      <div className="fab-container ">
-        <div
+      <div className="fab-container">
+        <button
+          type="button"
           className="fab-btn"
           onClick={handleCart}
-          style={{ cursor: "pointer" }}
+          aria-label="Open shopping cart"
         >
-          <FaShoppingCart size={24} />
-        </div>
+          <FaShoppingCart size={24} aria-hidden />
+        </button>
       </div>
 
-      <div className="d-flex justify-content-around align-items-center left ">
-        <a href="/user/wishlist" className="text-center nav-link">
-          <FaHeart size={20} />
+      <div className="d-flex justify-content-around align-items-center left">
+        <Link to="/user/wishlist" className="text-center nav-link py-2">
+          <FaHeart size={20} aria-hidden />
           <div>Wishlist</div>
-        </a>
+        </Link>
 
         {user?._id ? (
-          <a href="/user/account" className="text-center nav-link">
-            <RiAccountCircleFill size={20} />
+          <Link
+            to={user?.role === "admin" ? "/admin/adminDashboard" : "/user/account"}
+            className="text-center nav-link py-2"
+          >
+            <RiAccountCircleFill size={20} aria-hidden />
             <div>{user?.role === "admin" ? "Dashboard" : "Account"}</div>
-          </a>
+          </Link>
         ) : (
-          <a href="/login" className="text-center nav-link">
-            <FaSignInAlt size={20} />
+          <Link to="/login" className="text-center nav-link py-2">
+            <FaSignInAlt size={20} aria-hidden />
             <div>Login</div>
-          </a>
+          </Link>
         )}
       </div>
     </nav>

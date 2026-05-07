@@ -61,26 +61,15 @@ const ProductCard = ({ item }) => {
 
   return (
     <Card
-      className="border-0 shadow-sm rounded-4 overflow-hidden h-100 position-relative"
-      style={{
-        transition: "transform 0.3s ease, box-shadow 0.3s ease",
-        cursor: "pointer",
-      }}
+      className="product-card-app rounded-4 overflow-hidden h-100 position-relative border-0"
+      style={{ cursor: "pointer" }}
       onClick={handleProductClick}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "scale(1.02)";
-        e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.15)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-      }}
     >
       <div
         style={{
           height: "60%",
           minHeight: "14rem",
-          backgroundColor: "#fdfdfd",
+          backgroundColor: "#f8f9fb",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -124,6 +113,7 @@ const ProductCard = ({ item }) => {
         )}
 
         <button
+          type="button"
           className="btn btn-dark w-100 rounded-pill fw-semibold py-2"
           onClick={handleAddToCart}
         >

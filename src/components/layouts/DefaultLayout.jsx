@@ -31,42 +31,46 @@ const DefaultLayout = () => {
   };
 
   useEffect(() => {
-    if (!isCartOpen) return;
-    const handleClickOutsideCart = (event) => {
-      if (cartRef && !cartRef.current.contains(event.target)) {
-        handleCart();
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutsideCart);
+    if (isCartOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutsideCart);
+      document.body.style.overflow = "";
     };
   }, [isCartOpen]);
 
   return (
-    <div className="position-relative">
+    <div className="position-relative d-flex flex-column min-vh-100">
       <Header handleCart={handleCart} setNavHeight={setNavHeight} />
 
-      <main className="position-relative">
+      <main className="position-relative flex-grow-1">
         <Outlet />
 
         {isCartOpen && (
-          <div ref={cartRef}>
-            <div
-              className={`col-12 col-lg-6 col-md-8 bg-white overflow-y-scroll ${
-                isClosing ? "cart-animation-close" : "cart-animation-open"
-              }`}
-              style={{
-                position: "fixed",
-                top: navHeight,
-                right: 0,
-                zIndex: 100,
-                height: "100vh",
-              }}
-            >
-              <Cart handleCart={handleCart} />
+          <>
+            <button
+              type="button"
+              className="cart-drawer-backdrop border-0 p-0"
+              aria-label="Close cart overlay"
+              onClick={handleCart}
+              style={{ top: navHeight, WebkitTapHighlightColor: "transparent" }}
+            />
+            <div ref={cartRef} className="position-fixed end-0" style={{ top: navHeight, zIndex: 100 }}>
+              <div
+                className={`col-12 col-lg-6 col-md-8 bg-white overflow-y-auto cart-drawer-panel ${
+                  isClosing ? "cart-animation-close" : "cart-animation-open"
+                }`}
+                style={{
+                  height: `calc(100vh - ${navHeight}px)`,
+                  maxWidth: "min(100vw, 480px)",
+                }}
+              >
+                <Cart handleCart={handleCart} />
+              </div>
             </div>
-          </div>
+          </>
         )}
       </main>
 

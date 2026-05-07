@@ -10,82 +10,91 @@ const Login = () => {
   const [isResending, setIsResending] = useState(false);
   const dispatch = useDispatch();
 
-  const handleResendVerificationLink = (email) => {
-    const isEmailSent = dispatch(resendVerificationLinkAction(email));
+  const handleResendVerificationLink = (emailValue) => {
+    const isEmailSent = dispatch(resendVerificationLinkAction(emailValue));
     if (isEmailSent) {
       setEmail("");
       setIsResending(false);
     }
   };
+
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center bg-light"
-      style={{ minHeight: "64vh" }}
-    >
-      <Card
-        className="shadow rounded p-4 text-center"
-        style={{ width: "100%", maxWidth: "400px" }}
-      >
-        <Card.Title className="mb-3">Welcome Back!</Card.Title>
-        <LoginForm />
-        <div className="text-center mt-3">
-          Forget Password? <Link to="/forgetpassword">Reset Now</Link>
-        </div>
-        <p className="m-0">
-          New with us? <Link to="/register">Register</Link>
-        </p>
-        <p className="pt-2 m-0">Or</p>
+    <div className="auth-page app-page">
+      <Container className="d-flex justify-content-center align-items-center py-4">
+        <Card className="auth-card border-0">
+          <Card.Body className="p-0">
+            <Card.Title className="mb-4 text-center fs-4">Welcome back</Card.Title>
+            <LoginForm />
+            <div className="text-center mt-3 small">
+              <span className="text-muted">Forgot password?</span>{" "}
+              <Link to="/forgetpassword">Reset</Link>
+            </div>
+            <p className="text-center small mb-0 mt-3 text-muted">
+              New here? <Link to="/register">Create an account</Link>
+            </p>
 
-        {isResending ? (
-          <div className="">
-            <Form
-              className="d-flex align-items-center justify-content-center"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleResendVerificationLink(email);
-              }}
-            >
-              <div
-                className="position-relative"
-                style={{ width: "100%", maxWidth: "300px" }}
-              >
-                <input
-                  type="email"
-                  name="Email"
-                  required
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="form-control"
-                  style={{ paddingRight: "80px" }}
-                  placeholder="Your registered Email"
-                />
+            <hr className="my-4 opacity-25" />
 
-                <Button
-                  variant="outline"
-                  className="position-absolute top-50 translate-middle-y border-start"
-                  style={{ right: "5px" }}
-                  type="submit"
+            {isResending ? (
+              <div>
+                <Form
+                  className="d-flex flex-column gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleResendVerificationLink(email);
+                  }}
                 >
-                  Resend
+                  <Form.Label className="small text-muted mb-0">
+                    Resend activation email
+                  </Form.Label>
+                  <div className="position-relative">
+                    <Form.Control
+                      type="email"
+                      name="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Your registered email"
+                      className="pe-5"
+                    />
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="position-absolute top-50 end-0 translate-middle-y me-1"
+                      type="submit"
+                    >
+                      Send
+                    </Button>
+                  </div>
+                </Form>
+                <div className="d-flex justify-content-center mt-2">
+                  <Button
+                    type="button"
+                    variant="light"
+                    size="sm"
+                    className="border"
+                    onClick={() => setIsResending(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="small p-0"
+                  onClick={() => setIsResending(true)}
+                >
+                  Resend verification link
                 </Button>
               </div>
-            </Form>
-            <div className="d-flex justify-content-center">
-              <Button
-                onClick={() => setIsResending(!isResending)}
-                variant="light"
-                className="mt-2 border"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Button variant="link" onClick={() => setIsResending(!isResending)}>
-            Resend Verification link
-          </Button>
-        )}
-      </Card>
-    </Container>
+            )}
+          </Card.Body>
+        </Card>
+      </Container>
+    </div>
   );
 };
 

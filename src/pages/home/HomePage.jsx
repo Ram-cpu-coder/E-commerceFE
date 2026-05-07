@@ -60,7 +60,7 @@ const HomePage = () => {
   }, [dispatch, user?._id, hotPicks.length]);
 
   return (
-    <div className="mx-2">
+    <div className="mx-2 pb-5">
       <Suspense
         fallback={
           <Backdrop
@@ -102,8 +102,8 @@ const HomePage = () => {
             </Backdrop>
           ) : (
             <div className="d-flex flex-column align-items-center col-10 mt-5">
-              <h1 className="display-5 fw-bold text-dark text-center mb-3">
-                Explore More
+              <h1 className="display-6 app-section-title text-center mb-3">
+                Explore more
               </h1>
 
               <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 w-100">

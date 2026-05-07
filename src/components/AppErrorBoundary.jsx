@@ -25,24 +25,30 @@ export default class AppErrorBoundary extends Component {
         <Box
           sx={{
             p: 4,
-            maxWidth: 480,
+            maxWidth: 440,
             mx: "auto",
-            mt: 8,
+            mt: 6,
+            mb: 6,
             textAlign: "center",
+            borderRadius: 2,
+            bgcolor: "background.paper",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+            border: "1px solid",
+            borderColor: "divider",
           }}
         >
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" component="h1" gutterBottom fontWeight={600}>
             Something went wrong
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Please refresh the page. If the problem continues, try again later.
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
+            Please reload the page. If this keeps happening, try again in a few
+            minutes.
           </Typography>
-          <Button variant="contained" onClick={this.handleReload}>
-            Reload
+          <Button variant="contained" size="medium" onClick={this.handleReload}>
+            Reload page
           </Button>
         </Box>
       );
-    }
-    return this.props.children;
+    }    return this.props.children;
   }
 }
