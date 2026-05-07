@@ -67,7 +67,7 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    dispatch(setMenu("Login & Security"));
+    dispatch(setMenu("Settings"));
   }, []);
 
   if (!user._id) {
@@ -155,7 +155,7 @@ const Profile = () => {
 
   return (
     user._id && (
-      <UserLayout pageTitle="Login & Security">
+      <UserLayout pageTitle="Settings">
         <BreadCrumbsAdmin />
         <div className="w-100 d-flex justify-content-center align-items-center">
           <div className="border col-12 col-md-10 col-lg-6 rounded pt-3 d-flex flex-column align-items-center">

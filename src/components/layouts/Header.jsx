@@ -33,14 +33,15 @@ const Header = ({ handleCart, setNavHeight }) => {
   }, [setNavHeight]);
 
   return (
-    <Navbar
-      expand="lg"
-      expanded={expanded}
-      onToggle={() => setExpanded((prev) => !prev)}
-      className="app-navbar bg-body-tertiary w-100 sticky-top"
-      ref={navRef}
-    >
-      <Container>
+    <>
+      <Navbar
+        expand="lg"
+        expanded={expanded}
+        onToggle={() => setExpanded((prev) => !prev)}
+        className="app-navbar bg-body-tertiary w-100 sticky-top"
+        ref={navRef}
+      >
+        <Container>
         <Navbar.Collapse id="navbar-left" className="order-1 order-lg-0">
           <Nav className="align-items-lg-center">
             <Link to="/shop" className="px-3 py-2 nav-link nav-link-app">
@@ -64,7 +65,7 @@ const Header = ({ handleCart, setNavHeight }) => {
           </Link>
         </Navbar.Brand>
 
-        <div id="navbar-search-mobile" className="d-block d-md-none">
+        <div id="navbar-search-mobile" className="d-none">
           <Nav className="ms-auto">
             <button
               type="button"
@@ -130,9 +131,10 @@ const Header = ({ handleCart, setNavHeight }) => {
           </Nav>
         </Navbar.Collapse>
 
-        <BottomNavBar handleCart={handleCart} user={user} />
-      </Container>
-    </Navbar>
+        </Container>
+      </Navbar>
+      <BottomNavBar handleCart={handleCart} user={user} />
+    </>
   );
 };
 

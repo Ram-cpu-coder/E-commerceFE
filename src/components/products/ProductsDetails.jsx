@@ -6,6 +6,11 @@ import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { createCartAction } from "../../features/cart/cartAction";
 import Description from "./Description";
+import {
+  IoBagAddOutline,
+  IoCubeOutline,
+  IoShieldCheckmarkOutline,
+} from "react-icons/io5";
 
 const ProductsDetails = ({
   handleFavourite,
@@ -45,31 +50,31 @@ const ProductsDetails = ({
 
   return (
     // selectedProduct detail
-    <div className="col-sm-12 col-md-8 rounded p-3" style={{ height: "auto" }}>
-      <h2 className="fs-5" style={{ width: "90%" }}>
-        {selectedProduct.name}
-      </h2>
+    <div className="col-sm-12 col-lg-8 product-info-panel">
+      <h2 className="product-detail-title">{selectedProduct.name}</h2>
       <div className="fs-3 w-100 d-flex flex-column align-items-start w-100 justify-content-center py-3">
-        <div className="text-primary" style={{ fontSize: "15px" }}>
-          {selectedCategory.categoryName}
+        <div className="section-kicker">
+          {selectedCategory?.categoryName}
         </div>
         <div className="d-flex justify-content-between w-100">
           <span className="d-flex align-items-start">
             <span className="fs-5">$</span>
-            <strong>{selectedProduct.price}</strong>
+            <strong className="price-tag fs-2">{selectedProduct.price}</strong>
           </span>
 
           {isInWishList ? (
             <button
-              className="border-1 px-3 py-1 rounded bg-transparent"
+              className="wishlist-button"
               onClick={() => handleDeleteWishlist(wishListItem._id)}
+              aria-label="Remove from wishlist"
             >
               <GoHeartFill className="fs-4" />
             </button>
           ) : (
             <button
-              className="border-1 px-3 py-1 rounded bg-transparent"
+              className="wishlist-button"
               onClick={handleFavourite}
+              aria-label="Add to wishlist"
             >
               <FaRegHeart className="fs-4" />
             </button>
@@ -82,32 +87,47 @@ const ProductsDetails = ({
           <Stars avgRating={avgRating} />
         </div>
       </div>
-      {/* quantity */}
-      <div className="d-flex align-items-center">
-        <p className="px-2 my-2">Quantity:</p>
-        <button
-          className="border border-black px-2 py-0 fs-5"
-          onClick={handleOnSubtract}
-        >
-          -
-        </button>
-
-        <span className="px-3" style={{ width: "10px" }}>
-          {quantity}
+      <div className="product-assurance-strip">
+        <span>
+          <IoCubeOutline aria-hidden />
+          {selectedProduct.stock ? "In stock" : "Limited availability"}
         </span>
+        <span>
+          <IoShieldCheckmarkOutline aria-hidden />
+          Secure checkout
+        </span>
+      </div>
+      {/* quantity */}
+      <div className="d-flex align-items-center gap-3 flex-wrap">
+        <p className="my-2 fw-semibold">Quantity</p>
+        <div className="quantity-control">
+          <button
+            className="quantity-button"
+            onClick={handleOnSubtract}
+            aria-label="Decrease quantity"
+          >
+            -
+          </button>
 
-        <button
-          className="border border-black px-2 py-0 fs-5"
-          onClick={handleOnAdd}
-        >
-          +
-        </button>
+          <span className="px-2 fw-bold" style={{ minWidth: "20px" }}>
+            {quantity}
+          </span>
+
+          <button
+            className="quantity-button"
+            onClick={handleOnAdd}
+            aria-label="Increase quantity"
+          >
+            +
+          </button>
+        </div>
       </div>
       {/* add cart button */}
       <Button
-        className="bg-black w-100 rounded my-3 py-2"
+        className="btn-luxe w-100 rounded-pill my-4 py-3 fw-bold"
         onClick={() => handleOnAddCart(selectedProduct._id, quantity)}
       >
+        <IoBagAddOutline className="me-2" aria-hidden />
         Add to cart
       </Button>
       <Description description={selectedProduct.description} />

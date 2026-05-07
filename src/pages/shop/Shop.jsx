@@ -38,14 +38,20 @@ const Shop = () => {
         }
       >
         <HotPicks />
-        <div className="d-flex flex-column align-items-center col-10 mt-4 mt-md-5 px-2">
-          <h1 className="display-6 app-section-title text-center mb-3">
-            Shop collection
-          </h1>
-          <p className="text-muted text-center small mb-4 col-lg-8">
-            Browse our catalog and tap a product for details.
-          </p>
-          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4 w-100">
+        <div className="d-flex flex-column align-items-center storefront-section mt-4 mt-md-5 px-2">
+          <div className="storefront-section-header">
+            <div>
+              <p className="section-kicker">Full catalogue</p>
+              <h1 className="display-6 app-section-title mb-2">
+                Shop collection
+              </h1>
+              <p className="section-subcopy">
+                Browse the full range and open any product for details,
+                reviews, gallery views, and cart options.
+              </p>
+            </div>
+          </div>
+          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 w-100">
             {publicProducts?.docs?.map((item) => (
               <div
                 className="col"

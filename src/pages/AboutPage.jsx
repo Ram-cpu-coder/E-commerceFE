@@ -49,7 +49,8 @@ const AboutPage = () => {
 
     // Basic validation before hitting backend
     if (formData.message.trim().length < 10) {
-      alert("Message should be at least 10 characters long.");
+      toast.error("Message should be at least 10 characters long.");
+      setLoading(false);
       return;
     }
 
@@ -65,12 +66,17 @@ const AboutPage = () => {
       });
 
       // Check for valid response
-      if (response.status !== 200 && response.status !== 201) {
-        alert("Form could not be submitted! Try again later.");
+      if (
+        (response.status !== 200 && response.status !== 201) ||
+        response.data?.status === "error"
+      ) {
+        toast.error(
+          response.data?.message || "Form could not be submitted. Try again later."
+        );
         return;
       }
 
-      toast("Submitted");
+      toast.success(response.data?.message || "Message sent successfully.");
     } catch (error) {
       console.error(
         "❌ Submission error:",
@@ -79,9 +85,9 @@ const AboutPage = () => {
 
       // More user-friendly feedback
       if (error.response?.status === 400) {
-        alert(error.response.data?.message || "Invalid form data.");
+        toast.error(error.response.data?.message || "Invalid form data.");
       } else {
-        alert("Something went wrong. Please try again later.");
+        toast.error("Something went wrong. Please try again later.");
       }
     } finally {
       setFormData({ name: "", email: "", message: "" });
@@ -97,61 +103,68 @@ const AboutPage = () => {
   }, []);
 
   return (
-    <section className="about-section py-5">
-      <Container>
+    <section className="about-section about-page">
+      <Container className="about-container">
         {/* Hero Section */}
-        <Row className="align-items-center mb-4">
-          <Col md={6} data-aos="fade-right" className="my-2">
-            <h1 className="display-4 fw-bold gradient-text">Our Story</h1>
+        <Row className="align-items-center about-hero">
+          <Col lg={6} data-aos="fade-right" className="my-2">
+            <p className="section-kicker">Built for better shopping</p>
+            <h1 className="display-3 fw-bold">NEPASTORE</h1>
             <p className="lead text-muted">
               Welcome to <strong>NEPASTORE</strong> — your go-to destination for
               curated fashion, home essentials, and lifestyle products. We bring
               quality, affordability, and style together under one roof.
             </p>
-            <Button variant="dark" href="/shop" size="lg">
+            <Button className="btn-luxe rounded-pill px-4 py-3" href="/shop" size="lg">
               Browse Our Collections
             </Button>
           </Col>
-          <Col md={6} data-aos="zoom-in">
-            <Image src="./Logo.png" alt="NEPASTORE Story" fluid rounded />
+          <Col lg={6} data-aos="zoom-in">
+            <div className="about-hero-image">
+              <Image src="./Logo.png" alt="NEPASTORE Story" fluid />
+            </div>
           </Col>
         </Row>
 
         {/* Mission & Vision */}
-        <Row className="text-center mb-5">
+        <Row className="text-center mb-5 g-4">
           <Col
             md={6}
             data-aos="fade-up"
             data-aos-delay="100"
-            className="text-center bg-white py-4 px-2"
+            className="text-center"
           >
-            <h3 className="mb-3">Our Mission</h3>
-            <p className="text-muted">
-              To make online shopping seamless, enjoyable, and accessible,
-              offering products that delight every customer.
-            </p>
+            <div className="about-feature-card">
+              <h3 className="mb-3">Our Mission</h3>
+              <p className="text-muted">
+                To make online shopping seamless, enjoyable, and accessible,
+                offering products that delight every customer.
+              </p>
+            </div>
           </Col>
           <Col
             md={6}
             data-aos="fade-up"
             data-aos-delay="200"
-            className="text-center bg-white py-4 px-2"
+            className="text-center"
           >
-            <h3 className="mb-3">Our Vision</h3>
-            <p className="text-muted">
-              To become the most trusted e-commerce platform in our community,
-              where quality, service, and variety are unmatched.
-            </p>
+            <div className="about-feature-card">
+              <h3 className="mb-3">Our Vision</h3>
+              <p className="text-muted">
+                To become the most trusted e-commerce platform in our community,
+                where quality, service, and variety are unmatched.
+              </p>
+            </div>
           </Col>
         </Row>
 
         {/* Values */}
         <Row className="mb-5">
           <Col>
-            <h2 className="text-center mb-4" data-aos="fade-up">
+            <h2 className="text-center mb-4 app-section-title" data-aos="fade-up">
               Our Values
             </h2>
-            <Row className="text-center">
+            <Row className="text-center g-4">
               {[
                 { title: "Quality", text: "Premium products at great value" },
                 {
@@ -172,7 +185,7 @@ const AboutPage = () => {
                   data-aos="fade-up"
                   data-aos-delay={idx * 100}
                 >
-                  <div className="value-card shadow-sm p-3 rounded h-100">
+                  <div className="value-card h-100">
                     <h5>{value.title}</h5>
                     <p className="text-muted small">{value.text}</p>
                   </div>
@@ -184,13 +197,13 @@ const AboutPage = () => {
 
         {/* Team Section */}
         <Row className="mb-5">
-          <h2 className="text-center mb-4" data-aos="fade-up">
+          <h2 className="text-center mb-4 app-section-title" data-aos="fade-up">
             Meet the Team
           </h2>
           {team.map((member, idx) => (
             <Col
               md={4}
-              className="text-center mb-4"
+              className="text-center mb-4 about-team-card"
               key={idx}
               data-aos="fade-up"
               data-aos-delay={member.delay}
@@ -209,11 +222,11 @@ const AboutPage = () => {
 
         {/* Testimonials */}
         <Row className="mb-5">
-          <h2 className="text-center mb-4" data-aos="fade-up">
+          <h2 className="text-center mb-4 app-section-title" data-aos="fade-up">
             What Our Customers Say
           </h2>
           <Col md={6} data-aos="fade-right">
-            <blockquote className="blockquote text-center bg-white p-4 rounded shadow">
+            <blockquote className="blockquote text-center about-quote">
               <p className="mb-0">
                 "NEPASTORE makes shopping online so easy! I love the product
                 variety and fast delivery."
@@ -224,7 +237,7 @@ const AboutPage = () => {
             </blockquote>
           </Col>
           <Col md={6} data-aos="fade-left">
-            <blockquote className="blockquote text-center bg-white p-4 rounded shadow">
+            <blockquote className="blockquote text-center about-quote">
               <p className="mb-0">
                 "The quality of the items I ordered exceeded my expectations.
                 Highly recommend NEPASTORE!"
@@ -238,7 +251,7 @@ const AboutPage = () => {
         <Row className="text-center mb-5">
           <Col data-aos="zoom-in">
             <h3 className="mb-3">Ready to find your next favorite item?</h3>
-            <Button variant="dark" size="lg" href="/shop">
+            <Button className="btn-luxe rounded-pill px-5 py-3" size="lg" href="/shop">
               Shop Now
             </Button>
           </Col>
@@ -247,7 +260,7 @@ const AboutPage = () => {
         {/* Contact Form */}
         <Row className="justify-content-center mb-5">
           <Col md={8} lg={6} data-aos="zoom-in">
-            <div className="bg-white p-4 rounded shadow">
+            <div className="about-contact-card">
               <h3 className="text-center mb-4">Get in Touch</h3>
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formName">
@@ -289,7 +302,7 @@ const AboutPage = () => {
 
                 <div className="text-center">
                   <Button
-                    variant="dark"
+                    className="btn-luxe rounded-pill px-5"
                     type="submit"
                     size="lg"
                     disabled={loading}

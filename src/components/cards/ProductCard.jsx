@@ -65,16 +65,12 @@ const ProductCard = ({ item }) => {
       style={{ cursor: "pointer" }}
       onClick={handleProductClick}
     >
-      <div
-        style={{
-          height: "60%",
-          minHeight: "14rem",
-          backgroundColor: "#f8f9fb",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <div className="product-media-panel">
+        {selectedCategory && (
+          <span className="product-card-badge">
+            {selectedCategory.categoryName}
+          </span>
+        )}
         <Card.Img
           variant="top"
           src={images[0]}
@@ -91,11 +87,11 @@ const ProductCard = ({ item }) => {
 
       <Card.Body className="d-flex flex-column justify-content-between p-4">
         <div>
-          <h5 className="fw-semibold mb-2 text-dark">
+          <h5 className="fw-bold mb-2 text-dark">
             {name.length > 50 ? name.slice(0, 47) + "..." : name}
           </h5>
           <div className="d-flex justify-content-between align-items-center mb-2">
-            <span className="fw-bold fs-5 text-success">
+            <span className="price-tag">
               ${price.toFixed(2)}
             </span>
             {ttlRatings > 0 ? (
@@ -106,15 +102,9 @@ const ProductCard = ({ item }) => {
           </div>
         </div>
 
-        {selectedCategory && (
-          <span className="badge bg-light text-dark rounded-pill px-3 py-2 mb-3 text-uppercase fw-medium">
-            {selectedCategory.categoryName}
-          </span>
-        )}
-
         <button
           type="button"
-          className="btn btn-dark w-100 rounded-pill fw-semibold py-2"
+          className="btn btn-luxe w-100 rounded-pill fw-semibold py-2 mt-3"
           onClick={handleAddToCart}
         >
           Add to Cart

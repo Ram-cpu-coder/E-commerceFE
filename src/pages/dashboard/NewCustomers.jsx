@@ -81,10 +81,10 @@ const NewCustomers = () => {
 
   return (
     <Col xs={12} sm={6}>
-      <div className="border rounded-4 py-3 px-4 h-100">
+      <div className="dashboard-stat-card h-100">
         <div className="d-flex flex-row align-items-center">
           <div className="d-flex flex-row align-items-center gap-2 me-auto">
-            <IoPeopleSharp className="fs-1 bg-secondary rounded-3 p-2" />
+            <IoPeopleSharp className="dashboard-stat-icon" />
             <div className="d-flex flex-column">
               <strong className="fs-5">New Customers</strong>
               <span className="text-muted">

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { GoCopy } from "react-icons/go";
 import { useDispatch } from "react-redux";
 import { updateOrderAction } from "../../features/orders/orderActions";
+import { IoBarcodeOutline, IoCalendarClearOutline } from "react-icons/io5";
 
 const TopPart = ({ item, user }) => {
   const dispatch = useDispatch();
@@ -21,56 +22,50 @@ const TopPart = ({ item, user }) => {
     }
   }, [showText]);
 
+  const statusLabel = String(item.status || "")
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (char) => char.toUpperCase());
+
   return (
-    <div
-      className="d-flex justify-content-between flex-wrap"
-      style={{ width: "98%" }}
-    >
+    <div className="order-card-top">
       {/* tracking id */}
-      <div className="mb-0 d-flex align-items-center">
-        <span>
-          <b>Tracking Id:</b> {item._id}
+      <div className="order-card-id">
+        <span className="order-meta-label">
+          <IoBarcodeOutline aria-hidden />
+          Tracking ID
         </span>
-        &nbsp;
-        <GoCopy
+        <span className="order-id-value">{item._id}</span>
+        <button
+          type="button"
+          className="order-copy-button"
           onClick={() => {
             navigator.clipboard.writeText(item._id);
             setShowText(true);
           }}
-          style={{
-            cursor: "pointer",
-            userSelect: "text",
-            color: "blue",
-          }}
           title="Copy Order Id"
-        />
+          aria-label="Copy order id"
+        >
+          <GoCopy aria-hidden />
+        </button>
         {showText && (
-          <span className="text-success ms-2 small" style={{ fontWeight: 500 }}>
+          <span className="text-success small" style={{ fontWeight: 700 }}>
             Copied!
           </span>
         )}
       </div>
 
       {/* status of the order*/}
-      <div style={{ height: "auto" }}>
-        <b>Placed At:</b> {new Date(item.createdAt).toLocaleDateString()} |
-        &nbsp;
+      <div className="order-card-status">
+        <span className="order-date">
+          <IoCalendarClearOutline aria-hidden />
+          {new Date(item.createdAt).toLocaleDateString()}
+        </span>
         {user.role === "admin" ? (
           <select
-            className={
-              item.status === "pending"
-                ? "text-warning"
-                : item.status === "shipped"
-                ? "text-primary"
-                : "text-success"
-            }
-            style={{
-              border: "0px",
-              background: "transparent",
-              outline: "none",
-            }}
+            className="order-status-select"
             value={item.status}
             onChange={(e) => handleOnStatus(e, item?._id)}
+            aria-label="Update order status"
           >
             <option value="pending" className="text-warning">
               Pending
@@ -91,18 +86,24 @@ const TopPart = ({ item, user }) => {
             <option value="delivered" className="text-success">
               Delivered
             </option>
+            <option value="cancelled" className="text-danger">
+              Cancelled
+            </option>
+            <option value="canceled" className="text-danger">
+              Canceled
+            </option>
           </select>
         ) : (
           <span
-            className={
+            className={`order-status-pill ${
               item.status === "pending"
-                ? "text-warning"
-                : item.status === "shipped"
-                ? "text-primary"
-                : "text-success"
-            }
+                ? "status-pending"
+                : item.status === "delivered"
+                ? "status-delivered"
+                : "status-active"
+            }`}
           >
-            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+            {statusLabel}
           </span>
         )}
       </div>

@@ -57,14 +57,18 @@ const DefaultLayout = () => {
               onClick={handleCart}
               style={{ top: navHeight, WebkitTapHighlightColor: "transparent" }}
             />
-            <div ref={cartRef} className="position-fixed end-0" style={{ top: navHeight, zIndex: 100 }}>
+            <div
+              ref={cartRef}
+              className="cart-drawer-host"
+              style={{ top: navHeight }}
+            >
               <div
-                className={`col-12 col-lg-6 col-md-8 bg-white overflow-y-auto cart-drawer-panel ${
+                className={`overflow-y-auto cart-drawer-panel ${
                   isClosing ? "cart-animation-close" : "cart-animation-open"
                 }`}
                 style={{
                   height: `calc(100vh - ${navHeight}px)`,
-                  maxWidth: "min(100vw, 480px)",
+                  width: "min(100vw, 480px)",
                 }}
               >
                 <Cart handleCart={handleCart} />

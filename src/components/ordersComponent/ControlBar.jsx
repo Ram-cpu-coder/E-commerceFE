@@ -1,20 +1,36 @@
 import { Col, Form, Row } from "react-bootstrap";
+import { IoSearchOutline } from "react-icons/io5";
+
+const statusOptions = [
+  ["all", "All statuses"],
+  ["pending", "Pending"],
+  ["confirmed", "Confirmed"],
+  ["shipped", "Shipped"],
+  ["inTransit", "In Transit"],
+  ["outForDelivery", "Out for Delivery"],
+  ["delivered", "Delivered"],
+  ["cancelled", "Cancelled"],
+  ["canceled", "Canceled"],
+];
 
 const ControlBar = ({ handleOnChange, form }) => {
   return (
-    <Form>
-      <Row>
+    <Form className="orders-control-panel">
+      <Row className="g-3 align-items-center">
         {/* searching feature */}
-        <Col md={6}>
-          <Form.Control
-            name="searchQuery"
-            type="text"
-            placeholder="Search Orders ..."
-            onChange={handleOnChange}
-          />
+        <Col lg={6}>
+          <div className="orders-search-field">
+            <IoSearchOutline aria-hidden />
+            <Form.Control
+              name="searchQuery"
+              type="text"
+              placeholder="Search orders, status, address..."
+              onChange={handleOnChange}
+            />
+          </div>
         </Col>
         {/* status and the date sorting orders */}
-        <Col className="d-flex justify-content-end gap-1 gap-sm-2 mt-3 mt-sm-0">
+        <Col className="d-flex justify-content-lg-end gap-2 flex-wrap">
           {/* sorting acc to status */}
           <Form.Group>
             <Form.Select
@@ -22,16 +38,11 @@ const ControlBar = ({ handleOnChange, form }) => {
               value={form.status}
               onChange={handleOnChange}
             >
-              <option value="all">All</option>
-              <option value="pending" className="text-warning">
-                Pending
-              </option>
-              <option value="shipped" className="text-primary">
-                Shipped
-              </option>
-              <option value="delivered" className="text-success">
-                Delivered
-              </option>
+              {statusOptions.map(([value, label]) => (
+                <option value={value} key={value}>
+                  {label}
+                </option>
+              ))}
             </Form.Select>
           </Form.Group>
           {/* sorting acc to date */}

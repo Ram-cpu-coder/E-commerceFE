@@ -34,11 +34,20 @@ const HotPicks = ({ handleOnClickProduct }) => {
   }
   return (
     <div className="w-100 d-flex justify-content-center mt-5">
-      <div className="d-flex flex-column align-items-center col-10">
-        <h1 className="display-5 fw-bold text-dark text-center mb-3">
-          Recommended For You
-        </h1>
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 w-100">
+      <div className="d-flex flex-column align-items-center storefront-section storefront-shell rounded-4 p-3 p-md-4">
+        <div className="storefront-section-header">
+          <div>
+            <p className="section-kicker">Picked for you</p>
+            <h1 className="display-6 app-section-title mb-2">
+              Recommended For You
+            </h1>
+            <p className="section-subcopy">
+              Based on your browsing rhythm and the products shoppers keep
+              coming back to.
+            </p>
+          </div>
+        </div>
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 w-100">
           {hotPicks?.map((item, index) => (
             <div
               className="col"

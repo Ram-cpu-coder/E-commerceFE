@@ -152,12 +152,19 @@ const ProductLandingPage = () => {
   }
 
   return (
-    <div
-      className="w-100 d-flex justify-content-center py-2 position-relative bg-light-subtle"
-      style={{ minHeight: "75dvh" }}
-    >
+    <div className="product-page-shell">
+      <div className="product-page-hero">
+        <div>
+          <p className="section-kicker">Product detail</p>
+          <h1>{selectedProduct.name}</h1>
+          <p>
+            Explore the gallery, reviews, pricing, and stock details before
+            adding this item to your cart.
+          </p>
+        </div>
+      </div>
       <div className="d-flex align-items-center w-100 flex-column gap-4 mb-5">
-        <div className="d-flex flex-column flex-md-row justify-content-around align-items-start container col-11 col-lg-8 col-md-12 rounded-4 shadow bg-white py-3 px-2">
+        <div className="d-flex flex-column flex-lg-row justify-content-around align-items-start container col-11 col-xl-9 col-lg-10 col-md-12 product-detail-shell">
           <Suspense
             fallback={
               <Box sx={{ width: 300, height: 300, m: 2 }}>
@@ -170,6 +177,7 @@ const ProductLandingPage = () => {
           <Suspense fallback={<div>Loading Details...</div>}>
             <ProductsDetails
               handleFavourite={toggleWishlist}
+              handleDeleteWishlist={toggleWishlist}
               favourite={favourite}
               avgRating={avgRating}
               selectedProduct={selectedProduct}
@@ -179,7 +187,7 @@ const ProductLandingPage = () => {
         </div>
 
         {showReviews && (
-          <div className="d-flex flex-column flex-md-row justify-content-around align-items-start container col-11 col-lg-8 col-md-12 rounded-4 shadow bg-white py-3 px-2">
+          <div className="d-flex flex-column flex-md-row justify-content-around align-items-start container col-11 col-xl-9 col-lg-10 col-md-12 review-shell">
             <Suspense fallback={<div>Loading Reviews...</div>}>
               <ProductReviews selectedProduct={selectedProduct} />
             </Suspense>

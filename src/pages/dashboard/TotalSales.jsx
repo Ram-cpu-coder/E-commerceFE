@@ -97,10 +97,10 @@ const TotalSales = () => {
       onClick={() => navigate("/admin/orders")}
       style={{ cursor: "pointer" }}
     >
-      <div className="border rounded-4 bg-dark text-white py-3 px-4 h-100">
+      <div className="dashboard-stat-card dashboard-stat-card-dark h-100">
         <div className="d-flex flex-row align-items-center">
           <div className="d-flex flex-row align-items-center gap-2 me-auto">
-            <IoBagHandleSharp className="fs-1 bg-secondary rounded-3 p-2" />
+            <IoBagHandleSharp className="dashboard-stat-icon" />
             <div className="d-flex flex-column">
               <strong className="fs-5">Total Sales</strong>
               <span className="text-secondary">

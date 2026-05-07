@@ -6,7 +6,7 @@ const ProductsImages = ({ selectedProduct }) => {
   const [selectedImg, setSelectedImg] = useState(null);
   return (
     <div
-      className="d-flex flex-column flex-md-row justify-content-center gap-2 col-12 col-md-4 sticky-element border"
+      className="d-flex flex-column flex-md-row justify-content-center gap-2 col-12 col-lg-4 sticky-element product-image-gallery"
       style={{ maxHeight: "100dvh" }}
     >
       {/* image */}

@@ -6,10 +6,10 @@ import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 const Refunds = () => {
   return (
     <Col xs={12} md={3}>
-      <div className="border rounded-4 py-3 px-4 h-100">
+      <div className="dashboard-stat-card h-100">
         <div className="d-flex flex-row align-items-center">
           <div className="d-flex flex-row align-items-center gap-2 me-auto">
-            <IoBagHandleSharp className="fs-1 bg-info rounded-3 p-2" />
+            <IoBagHandleSharp className="dashboard-stat-icon" />
             <div className="d-flex flex-column">
               <strong className="fs-5">Returns</strong>
               <span className="text-muted">85 Refunds</span>

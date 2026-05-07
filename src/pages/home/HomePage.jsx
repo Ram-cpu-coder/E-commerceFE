@@ -60,7 +60,7 @@ const HomePage = () => {
   }, [dispatch, user?._id, hotPicks.length]);
 
   return (
-    <div className="mx-2 pb-5">
+    <div className="storefront-page pb-5">
       <Suspense
         fallback={
           <Backdrop
@@ -101,12 +101,21 @@ const HomePage = () => {
               <CircularProgress color="inherit" />
             </Backdrop>
           ) : (
-            <div className="d-flex flex-column align-items-center col-10 mt-5">
-              <h1 className="display-6 app-section-title text-center mb-3">
-                Explore more
-              </h1>
+            <div className="d-flex flex-column align-items-center storefront-section mt-4">
+              <div className="storefront-section-header">
+                <div>
+                  <p className="section-kicker">Fresh arrivals</p>
+                  <h1 className="display-6 app-section-title mb-2">
+                    Explore more
+                  </h1>
+                  <p className="section-subcopy">
+                    A curated mix of standout pieces, everyday essentials, and
+                    fresh finds ready for your next cart.
+                  </p>
+                </div>
+              </div>
 
-              <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 w-100">
+              <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 w-100">
                 {publicProducts?.docs?.map((item) => (
                   <div
                     className="col"

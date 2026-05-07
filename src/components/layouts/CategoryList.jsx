@@ -14,19 +14,18 @@ const CategoryList = ({ isModalView = false }) => {
   };
 
   return (
-    <div
-      className={`justify-content-center bg-light py-5 ${
-        isModalView ? "p-3" : ""
-      }`}
-    >
-      <h1 className="display-5 fw-bold text-dark text-center mb-3">
-        Categories
-      </h1>
+    <div className={isModalView ? "p-3" : "category-showcase"}>
+      <div className="storefront-section-header mb-3">
+        <div>
+          <p className="section-kicker">Shop by mood</p>
+          <h1 className="display-6 app-section-title mb-1">Categories</h1>
+        </div>
+      </div>
       <Col
         className={`fw-bold ${
           isModalView
             ? "d-flex flex-wrap justify-content-center gap-5"
-            : "d-flex gap-5 justify-content-sm-start justify-content-md-center"
+            : "category-rail"
         }`}
         style={
           isModalView
@@ -44,16 +43,14 @@ const CategoryList = ({ isModalView = false }) => {
             onClick={() => handleCategoryClick(category)}
             className="text-decoration-none text-black g-2"
           >
-            <div className="text-center category-item pt-3">
+            <div
+              className={`text-center category-item category-chip ${
+                selectedCategory?._id === category._id ? "active" : ""
+              }`}
+            >
               <img
                 src={category.categoryImage}
                 alt={category.categoryName}
-                style={{
-                  width: "60px",
-                  height: "60px",
-                  objectFit: "cover",
-                  borderRadius: "50%",
-                }}
               />
               <p className="mt-1">{category.categoryName}</p>
             </div>

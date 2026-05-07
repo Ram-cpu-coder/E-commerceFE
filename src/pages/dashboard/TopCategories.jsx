@@ -80,8 +80,8 @@ const TopCategories = () => {
   }, []);
 
   return (
-    <Col xs={12} md={5}>
-      <div className="border rounded-4 py-4 px-3 h-100 d-flex flex-column">
+    <Col xs={12} lg={5}>
+      <div className="dashboard-panel h-100 d-flex flex-column">
         <strong className="text-center mb-3 fs-5">Top Categories</strong>
 
         <div className="flex-grow-1 d-flex justify-content-center align-items-center">

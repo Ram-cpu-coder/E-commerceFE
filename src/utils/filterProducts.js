@@ -92,7 +92,21 @@ export const filterFunctionOrders = ({ date, searchQuery, status }, data) => {
 
   // Filter by search query
   if (searchQuery.trim()) {
-    filtered = filtered.filter((item) => item.products.some(product => product.name.toLowerCase().includes(searchQuery.toLowerCase())) || item._id.includes(searchQuery))
+    const query = searchQuery.toLowerCase();
+    filtered = filtered.filter((item) => {
+      const searchable = [
+        item._id,
+        item.status,
+        item.shippingAddress,
+        item.trackingId,
+        ...(item.products || []).map((product) => product.name),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return searchable.includes(query);
+    })
   }
 
   switch (date) {

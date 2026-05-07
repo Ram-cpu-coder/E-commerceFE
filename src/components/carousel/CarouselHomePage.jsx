@@ -53,10 +53,10 @@ export default function CarouselHomePage({ featureBanner }) {
               src={item.featureBannerImgUrl}
               alt="Carousel"
               style={{
-                objectFit: "contain",
+                objectFit: "cover",
                 cursor: "pointer",
                 width: "100%",
-                height: "auto",
+                height: "100%",
               }}
               onClick={() => handleBannerLandingPage(item._id)}
             />

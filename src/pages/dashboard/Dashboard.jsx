@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { UserLayout } from "../../components/layouts/UserLayout";
 import { setMenu } from "../../features/user/userSlice.js";
 import SmartDashboard from "./SmartDashboard.jsx";
@@ -15,16 +15,12 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [smartDashboard, setSmartDashboard] = useState(false);
 
-  const { user } = useSelector((state) => state.userInfo);
-  console.log(user, 9999);
-
-  const fetchData = async () => {
-    await dispatch(fetchUserAction());
-    setLoading(false);
-  };
-
-  console.log(user, 3333);
   useEffect(() => {
+    const fetchData = async () => {
+      await dispatch(fetchUserAction());
+      setLoading(false);
+    };
+
     dispatch(setMenu("Dashboard"));
     fetchData();
   }, [dispatch]);
@@ -42,7 +38,17 @@ const Dashboard = () => {
       <BreadCrumbsAdmin />
 
       {/* <SmartDashboard /> */}
-      <div className="w-100">
+      <div className="dashboard-grid-shell">
+        <section className="dashboard-hero">
+          <div>
+            <p className="section-kicker">Store command center</p>
+            <h2>Sales, customers, and activity at a glance</h2>
+            <p>
+              Monitor weekly revenue, demand patterns, customer growth, and the
+              latest operational updates from one focused workspace.
+            </p>
+          </div>
+        </section>
         {/* Top Bar */}
         <TopBar />
         <MidPart />
@@ -51,8 +57,7 @@ const Dashboard = () => {
 
       {/* smart dashboard */}
       <div
-        className="position-fixed border rounded-circle fs-3 px-2 bg-dark text-white"
-        style={{ bottom: "10px", right: "10px", cursor: "pointer" }}
+        className="dashboard-ai-button"
         onClick={() => setSmartDashboard(!smartDashboard)}
         title="AI Powered Chat Assistance"
       >
