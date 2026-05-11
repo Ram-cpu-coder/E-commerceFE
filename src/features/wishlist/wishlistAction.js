@@ -7,7 +7,7 @@ export const createWishlistAction = (obj) => async (dispatch) => {
     toast.promise(pending, {
         pending: "Processing..."
     })
-    const { status, message, data } = await pending;
+    const { status, message } = await pending;
     dispatch(getWishlistAction())
     toast[status](message)
 }
@@ -20,7 +20,7 @@ export const getWishlistAction = () => async (dispatch) => {
         else {
             dispatch(setWishlist([]))
         }
-    } catch (error) {
+    } catch {
         dispatch(setWishlist([]))
     }
 }
@@ -40,7 +40,7 @@ export const deleteWishlistItemAction = (_id) => async (dispatch) => {
     toast.promise(pending, {
         pending: "Processing..."
     })
-    const { status, message, data } = await pending;
+    const { status, message } = await pending;
     if (status === "success") { dispatch(getWishlistAction()) }
     toast[status](message)
     dispatch(getWishlistAction())

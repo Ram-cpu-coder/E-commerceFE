@@ -87,7 +87,6 @@ const AdminRoute = ({ children }) => {
 };
 
 const AppRoutes = () => {
-  const { user } = useSelector((state) => state.userInfo);
   const accessJWT = sessionStorage.getItem("accessJWT");
 
   const isAuthenticated = !!accessJWT;

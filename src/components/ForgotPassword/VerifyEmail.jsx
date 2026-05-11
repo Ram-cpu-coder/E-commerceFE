@@ -12,9 +12,12 @@ const VerifyEmail = ({
 }) => {
   const dispatch = useDispatch();
   const [isEmail, setIsEmail] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const handleOnEmailSubmit = async (e) => {
     e.preventDefault();
+    if (isSending || isEmail) return;
+    setIsSending(true);
     const response = await dispatch(
       verifyEmailAndSendOTPAction({ email: form.email })
     );
@@ -23,26 +26,25 @@ const VerifyEmail = ({
       setHeading("Enter your OTP...");
       setIsEmail(true);
     }
+    setIsSending(false);
   };
   return (
-    <div className="d-flex gap-3 mb-2">
+    <div className="forgot-password-row">
       <Form.Control
         name="email"
         value={form.email}
         type="email"
         disabled={isEmail ? true : false}
-        placeholder="Enter your Email"
+        placeholder="Enter your registered email"
         onChange={handleOnChange}
         required
-        style={{ height: "2.5rem" }}
       />
       <Button
         variant="primary"
         onClick={handleOnEmailSubmit}
-        disabled={isEmail ? true : false}
-        style={{ height: "2.5rem", width: "135px" }}
+        disabled={isEmail || isSending}
       >
-        Send OTP
+        {isSending ? "Sending..." : "Send OTP"}
       </Button>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { FaStar } from "react-icons/fa";
 import { MdOutlineRateReview } from "react-icons/md";
@@ -9,7 +9,6 @@ import { createReviewAction } from "../../features/reviews/reviewAction";
 const Review = ({
   productId,
   isReviewing,
-  setIsReviewing,
   handleToggleReview,
 }) => {
   const [ratings, setRatings] = useState(1);
@@ -75,7 +74,7 @@ const Review = ({
               name="comment"
               id="comment"
               className="px-2"
-              placeholder="Comment Here ...."
+              placeholder="Share what you liked, fit, quality, or delivery experience..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               style={{
@@ -108,7 +107,6 @@ const Review = ({
         title="Feedback"
         onClick={() => {
           handleToggleReview(productId);
-          console.log(isOpen, productId);
         }}
       />
     </div>

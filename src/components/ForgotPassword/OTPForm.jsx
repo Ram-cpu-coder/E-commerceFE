@@ -16,6 +16,7 @@ const OTPForm = ({
 }) => {
   const dispatch = useDispatch();
   const [isOTP, setIsOTP] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   const handleOnOTPSubmit = async (e) => {
     e.preventDefault();
@@ -42,6 +43,8 @@ const OTPForm = ({
   };
 
   const handleOnEmailSubmit = async () => {
+    if (isResending) return;
+    setIsResending(true);
     setIsOTP(false);
 
     setForm((prev) => ({
@@ -50,12 +53,13 @@ const OTPForm = ({
     }));
 
     await dispatch(verifyEmailAndSendOTPAction({ email: form.email }));
+    setTimeout(() => setIsResending(false), 30000);
   };
 
   return (
     isVerifyOtpUI && (
-      <div className="d-flex flex-column">
-        <div className="d-flex gap-3 mb-2">
+      <div className="forgot-otp-section">
+        <div className="forgot-otp-row">
           <OTPInput
             value={form.Otp || ""}
             inputType="number"
@@ -64,12 +68,13 @@ const OTPForm = ({
             renderSeparator={<span></span>}
             renderInput={(props) => <input {...props} disabled={isOTP} />}
             inputStyle={{
-              width: "2.5rem",
-              height: "2.5rem",
-              margin: "0 0.5rem",
-              fontSize: "1.5rem",
+              width: "2.75rem",
+              height: "2.75rem",
+              margin: "0 0.25rem",
+              fontSize: "1.25rem",
               borderRadius: "8px",
-              border: "1px solid #ced4da",
+              border: "1px solid rgba(24, 24, 27, 0.16)",
+              background: "#fff",
             }}
             focusStyle={{
               border: "2px solid #007bff",
@@ -81,16 +86,15 @@ const OTPForm = ({
             variant="primary"
             disabled={isOTP || String(form.Otp || "").length !== 6}
             onClick={handleOnOTPSubmit}
-            style={{ height: "2.5rem", width: "110px" }}
           >
             Verify OTP
           </Button>
         </div>
 
-        <p className="px-2">
+        <p className="forgot-resend-copy">
           Didn't get OTP?{" "}
-          <Button onClick={handleOnEmailSubmit} variant="link">
-            Resend
+          <Button onClick={handleOnEmailSubmit} variant="link" disabled={isResending}>
+            {isResending ? "Try again in 30s" : "Resend"}
           </Button>
         </p>
       </div>

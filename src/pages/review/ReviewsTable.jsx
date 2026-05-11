@@ -3,11 +3,10 @@ import ReviewRow from "./ReviewRow";
 
 const ReviewsTable = ({ allReviews }) => {
   return (
-    <div className=" table-responsive">
-      <table className="table">
+    <div className="admin-review-table-shell table-responsive">
+      <table className="table admin-review-table">
         <thead>
           <tr>
-            <th scope="col"></th>
             <th scope="col">Status</th>
             <th scope="col">Product</th>
             <th scope="col">User</th>

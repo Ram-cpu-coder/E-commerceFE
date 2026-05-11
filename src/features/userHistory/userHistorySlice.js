@@ -14,7 +14,7 @@ const userHistorySlice = createSlice({
     }
 })
 
-const { reducer, actions } = userHistorySlice;
+const { actions } = userHistorySlice;
 
 export const { setHotPicks } = actions
 export default userHistorySlice.reducer

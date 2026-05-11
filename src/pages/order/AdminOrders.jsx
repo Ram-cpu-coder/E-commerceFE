@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setMenu } from "../../features/user/userSlice";
 import { UserLayout } from "../../components/layouts/UserLayout";
@@ -6,7 +6,6 @@ import AdminOrdersCard from "../../components/cards/AdminOrdersCard";
 import PaginationRounded from "../../components/pagination/PaginationRounded";
 import {
   getAdminOrderAction,
-  getOrderAction,
 } from "../../features/orders/orderActions";
 import BreadCrumbsAdmin from "../../components/breadCrumbs/BreadCrumbsAdmin";
 

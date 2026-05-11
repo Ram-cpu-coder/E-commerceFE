@@ -22,14 +22,14 @@ export const getAdminProductAction = () => async (dispatch, getState) => {
   const page = getState().productInfo.productAdminPage
   const pending = getAdminProductApi(page);
 
-  const { status, message, products } = await pending;
+  const { products } = await pending;
   dispatch(setProducts(products));
 };
 // with no pagination
-export const getAdminProductNoPaginationAction = () => async (dispatch, getState) => {
+export const getAdminProductNoPaginationAction = () => async (dispatch) => {
   const pending = getAdminProductApi();
 
-  const { status, message, products } = await pending;
+  const { products } = await pending;
   dispatch(setAllAdminProducts(products));
 };
 
@@ -54,7 +54,7 @@ export const getPublicProductAction = () => async (dispatch, getState) => {
   const page = getState().productInfo.productCustomerPage
 
   const pending = getPublicProductApi(page);
-  const { status, message, products } = await pending;
+  const { status, products } = await pending;
   if (status === "success") {
     dispatch(setPublicProducts(products));
   }
@@ -65,7 +65,7 @@ export const getActiveProductAction = () => async (dispatch) => {
   toast.promise(pending, {
     pending: "Loading..."
   })
-  const { status, message, products } = await pending;
+  const { status, products } = await pending;
 
   if (status === "success") {
     dispatch(setAllActiveProducts(products))
@@ -79,8 +79,8 @@ export const getSingleProductAction = (id) => async (dispatch) => {
       dispatch(setSelectedProduct(product));
     }
 
-  } catch (error) {
-    console.log(error?.message)
+  } catch {
+    toast.error("Could not load product details.");
   };
 }
 
@@ -101,7 +101,6 @@ export const deleteProductAction = (_id) => async (dispatch) => {
 };
 
 export const updateProductAction = (id, updateObj) => async (dispatch) => {
-  console.log(id)
   const pending = updateProductApi(id, updateObj);
   const { status, message, updatedProduct } = await pending;
   if (status === "success") {
@@ -123,7 +122,7 @@ export const updateProductAction = (id, updateObj) => async (dispatch) => {
 export const updateProductActionIndividually = (id, updateObj) => async (dispatch) => {
   const pending = updateProductApiIndividually(id, updateObj);
 
-  const { status, message } = await pending;
+  const { status } = await pending;
   if (status === "success") {
     dispatch(getAdminProductAction());
     dispatch(getPublicProductAction());

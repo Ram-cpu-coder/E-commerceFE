@@ -5,7 +5,6 @@ import Stars from "../rating/Stars";
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { createCartAction } from "../../features/cart/cartAction";
-import Description from "./Description";
 import {
   IoBagAddOutline,
   IoCubeOutline,
@@ -50,7 +49,7 @@ const ProductsDetails = ({
 
   return (
     // selectedProduct detail
-    <div className="col-sm-12 col-lg-8 product-info-panel">
+    <div className="product-info-panel">
       <h2 className="product-detail-title">{selectedProduct.name}</h2>
       <div className="fs-3 w-100 d-flex flex-column align-items-start w-100 justify-content-center py-3">
         <div className="section-kicker">
@@ -130,7 +129,6 @@ const ProductsDetails = ({
         <IoBagAddOutline className="me-2" aria-hidden />
         Add to cart
       </Button>
-      <Description description={selectedProduct.description} />
     </div>
   );
 };

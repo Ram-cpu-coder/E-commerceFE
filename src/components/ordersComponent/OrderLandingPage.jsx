@@ -15,12 +15,40 @@ import {
   IoPersonOutline,
   IoSendOutline,
 } from "react-icons/io5";
+import AppDialog from "../dialogs/AppDialog";
 
 const formatDateTime = (value) => {
-  if (!value) return "-";
-  const [date, time = ""] = value.split("T");
+  if (!value) return "Date unavailable";
+  const dateValue = new Date(value);
+  if (Number.isNaN(dateValue.getTime())) return "Date unavailable";
+  const [date, time = ""] = dateValue.toISOString().split("T");
   return `${date} ${time ? `at ${time.split(".")[0]}` : ""}`;
 };
+
+const statusSteps = [
+  { key: "pending", label: "Pending" },
+  { key: "confirmed", label: "Confirmed" },
+  { key: "shipped", label: "Shipped" },
+  { key: "inTransit", label: "In Transit" },
+  { key: "outForDelivery", label: "Out for Delivery" },
+  { key: "delivered", label: "Delivered" },
+];
+
+const statusCopy = {
+  pending: "Order received and waiting for confirmation.",
+  confirmed: "Order confirmed and being prepared.",
+  shipped: "Package has left the warehouse.",
+  inTransit: "Package is moving through the courier network.",
+  outForDelivery: "Courier is taking the package to the delivery address.",
+  delivered: "Order has been delivered.",
+  cancelled: "Order has been cancelled.",
+  canceled: "Order has been canceled.",
+};
+
+const formatStatusLabel = (status = "") =>
+  String(status)
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (char) => char.toUpperCase());
 
 const OrderLandingPage = () => {
   const inquiryURL = import.meta.env.VITE_BACKEND_BASE_URL + "/inquiry";
@@ -32,29 +60,51 @@ const OrderLandingPage = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [dialog, setDialog] = useState(null);
 
   const { ordersNoPagination } = useSelector((state) => state.orderInfo);
   const selectedOrder = ordersNoPagination?.find((item) => item._id === id);
 
-  const steps = ["Pending", "Confirmed", "Shipped", "In Transit", "Delivered"];
-  const activeStep = selectedOrder?.status_history?.length || 0;
+  const currentStatus = selectedOrder?.status || "pending";
+  const activeStep = Math.max(
+    statusSteps.findIndex((step) => step.key === currentStatus),
+    0
+  );
+  const historyByStatus = new Map(
+    (selectedOrder?.status_history || []).map((entry) => [entry.status, entry])
+  );
   const timeline =
-    selectedOrder?.status_history?.length > 0
-      ? selectedOrder.status_history
-      : [
+    selectedOrder && (currentStatus === "cancelled" || currentStatus === "canceled")
+      ? [
           {
-            status: selectedOrder?.status || "pending",
-            date: selectedOrder?.createdAt,
-            description: "Order received and waiting for confirmation.",
+            status: currentStatus,
+            date:
+              historyByStatus.get(currentStatus)?.date ||
+              selectedOrder.updatedAt ||
+              selectedOrder.createdAt,
+            description: statusCopy[currentStatus],
           },
-        ];
+        ]
+      : statusSteps.slice(0, activeStep + 1).map((step, index) => {
+          const existing = historyByStatus.get(step.key);
+          return {
+            status: step.key,
+            date:
+              existing?.date ||
+              (index === 0 ? selectedOrder?.createdAt : selectedOrder?.updatedAt),
+            description: existing?.description || statusCopy[step.key],
+          };
+        });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     if (message.trim().length < 10) {
-      alert("Message should be at least 10 characters long.");
+      setDialog({
+        title: "Message is too short",
+        message: "Please write at least 10 characters so support has enough context.",
+      });
       setLoading(false);
       return;
     }
@@ -72,7 +122,10 @@ const OrderLandingPage = () => {
       });
 
       if (response.status !== 200 && response.status !== 201) {
-        alert("Form could not be submitted! Try again later.");
+        setDialog({
+          title: "Message not sent",
+          message: "The support form could not be submitted. Please try again later.",
+        });
         setLoading(false);
         return;
       }
@@ -85,9 +138,15 @@ const OrderLandingPage = () => {
       console.error("Submission error:", error.response?.data || error.message);
 
       if (error.response?.status === 400) {
-        alert(error.response.data?.message || "Invalid form data.");
+        setDialog({
+          title: "Invalid form data",
+          message: error.response.data?.message || "Please check the form and try again.",
+        });
       } else {
-        alert("Something went wrong. Please try again later.");
+        setDialog({
+          title: "Something went wrong",
+          message: "Please try sending your message again later.",
+        });
       }
     } finally {
       setLoading(false);
@@ -98,10 +157,8 @@ const OrderLandingPage = () => {
     const fetchingAllOrders = async () => {
       await dispatch(getAllOrderNoPaginationAction());
     };
-    if (ordersNoPagination.length === 0) {
-      fetchingAllOrders();
-    }
-  }, [dispatch, ordersNoPagination.length]);
+    fetchingAllOrders();
+  }, [dispatch, id]);
 
   return (
     <UserLayout pageTitle="Track Your Order">
@@ -116,8 +173,7 @@ const OrderLandingPage = () => {
             <div>
               <p className="section-kicker">Live order tracking</p>
               <h2>
-                {selectedOrder?.status?.charAt(0).toUpperCase() +
-                  selectedOrder?.status?.slice(1)}
+                {formatStatusLabel(selectedOrder?.status)}
               </h2>
               <p>
                 Tracking number <strong>{selectedOrder?._id}</strong>
@@ -131,9 +187,9 @@ const OrderLandingPage = () => {
 
           <div className="order-stepper-card">
             <Stepper activeStep={activeStep} alternativeLabel>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
+              {statusSteps.map((step) => (
+                <Step key={step.key}>
+                  <StepLabel>{step.label}</StepLabel>
                 </Step>
               ))}
             </Stepper>
@@ -186,8 +242,7 @@ const OrderLandingPage = () => {
                   <span className="order-timeline-dot" />
                   <div>
                     <strong>
-                      {status.status?.charAt(0).toUpperCase() +
-                        status.status?.slice(1)}
+                      {formatStatusLabel(status.status)}
                     </strong>
                     <small>{formatDateTime(status.date)}</small>
                     <p>{status.description || "Status updated."}</p>
@@ -214,7 +269,7 @@ const OrderLandingPage = () => {
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
+                  placeholder="Your full name"
                   required
                   className="form-control"
                 />
@@ -230,7 +285,7 @@ const OrderLandingPage = () => {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.email@example.com"
+                  placeholder="you@example.com"
                   required
                   className="form-control"
                 />
@@ -246,7 +301,7 @@ const OrderLandingPage = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   rows="4"
                   className="form-control"
-                  placeholder="Enter your message here..."
+                  placeholder="Tell us what you need help with..."
                   required
                 />
               </div>
@@ -263,6 +318,16 @@ const OrderLandingPage = () => {
           </div>
         </section>
       )}
+
+      <AppDialog
+        show={!!dialog}
+        variant="warning"
+        title={dialog?.title}
+        message={dialog?.message}
+        confirmOnly
+        confirmText="Got It"
+        onConfirm={() => setDialog(null)}
+      />
     </UserLayout>
   );
 };

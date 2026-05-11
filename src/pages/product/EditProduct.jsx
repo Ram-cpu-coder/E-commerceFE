@@ -7,8 +7,14 @@ import CustomInput from "../../components/custom inputs/CustomInput";
 import useForm from "../../hooks/useForm";
 import { productInputs } from "../../assets/form-data/ProductInput";
 import { MdDelete } from "react-icons/md";
+import {
+  IoCubeOutline,
+  IoImagesOutline,
+  IoRefreshOutline,
+} from "react-icons/io5";
 import { updateProductAction } from "../../features/products/productActions";
 import BreadCrumbsAdmin from "../../components/breadCrumbs/BreadCrumbsAdmin";
+import AppDialog from "../../components/dialogs/AppDialog";
 
 const EditProduct = () => {
   const { _id } = useParams();
@@ -22,14 +28,17 @@ const EditProduct = () => {
   const selectedProduct = products?.docs?.find((item) => item._id === _id);
   const { form, handleOnChange, setForm } = useForm(selectedProduct || {});
 
-  const [images, setImages] = useState([]); // new files only
-  const [oldImages, setOldImages] = useState([]); // remaining old URLs
-  const [previews, setPreviews] = useState([]); // combined for display
+  const [images, setImages] = useState([]);
+  const [oldImages, setOldImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
+  const [dialog, setDialog] = useState(null);
 
   useEffect(() => {
     if (selectedProduct) {
-      const { _id, images, ratings, reviews, ...cleanedProduct } =
-        selectedProduct;
+      const { images, ...cleanedProduct } = selectedProduct;
+      delete cleanedProduct._id;
+      delete cleanedProduct.ratings;
+      delete cleanedProduct.reviews;
 
       setForm(cleanedProduct);
       if (images?.length) {
@@ -45,7 +54,10 @@ const EditProduct = () => {
     const total = oldImages.length + images.length + newFiles.length;
 
     if (total > 4) {
-      alert("You can only upload up to 4 images total.");
+      setDialog({
+        title: "Image limit reached",
+        message: "You can only upload up to 4 product images total.",
+      });
       imageRef.current.value = "";
       return;
     }
@@ -59,17 +71,14 @@ const EditProduct = () => {
   const handleOnImageDelete = (index) => {
     const toDelete = previews[index];
 
-    // If it's an old image (URL), remove from oldImages
-    if (toDelete.startsWith("http")) {
+    if (oldImages.includes(toDelete)) {
       setOldImages((prev) => prev.filter((url) => url !== toDelete));
     } else {
-      // If it's a new file, remove the corresponding file
       const newFileStartIndex = oldImages.length;
       const fileIndex = index - newFileStartIndex;
       setImages((prev) => prev.filter((_, i) => i !== fileIndex));
     }
 
-    // Remove from previews
     setPreviews((prev) => prev.filter((_, i) => i !== index));
     imageRef.current.value = null;
   };
@@ -94,69 +103,106 @@ const EditProduct = () => {
   return (
     <UserLayout pageTitle="Edit Product">
       <BreadCrumbsAdmin />
-      <div className="mt-5">
-        <h4 className="py-4">Edit Product</h4>
-        <Form onSubmit={handleOnSubmit}>
-          {productInputs.map((input, i) => (
-            <CustomInput
-              key={i}
-              {...input}
-              onChange={handleOnChange}
-              value={form[input.name] || ""}
-            />
-          ))}
+      <section className="admin-form-page">
+        <div className="admin-form-hero">
+          <div className="admin-form-hero-icon">
+            <IoCubeOutline />
+          </div>
+          <div>
+            <span className="admin-form-kicker">Inventory Editor</span>
+            <h2>Edit Product</h2>
+            <p>
+              Refresh listing details, update stock, and manage the product
+              gallery without losing existing images.
+            </p>
+          </div>
+        </div>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Category</Form.Label>
-            <Form.Select
-              name="category"
-              value={form.category || ""}
-              onChange={handleOnChange}
-            >
-              <option value="">Select category</option>
-              {Categories.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.categoryName}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
+        <Form onSubmit={handleOnSubmit} className="admin-form-card">
+          <div className="admin-form-grid">
+            {productInputs.map((input) => (
+              <CustomInput
+                key={input.name}
+                {...input}
+                fieldClassName={input.name === "description" ? "full-span" : ""}
+                onChange={handleOnChange}
+                value={form[input.name] || ""}
+              />
+            ))}
 
-          <Form.Group className="mb-3">
-            <Form.Label>Upload Images</Form.Label>
-            <Form.Control
-              type="file"
-              name="images"
-              multiple
-              accept="image/*"
-              onChange={handleImageChange}
-              ref={imageRef}
-            />
-          </Form.Group>
+            <Form.Group className="admin-form-field">
+              <Form.Label>Category</Form.Label>
+              <Form.Select
+                className="admin-form-control"
+                name="category"
+                value={form.category || ""}
+                onChange={handleOnChange}
+              >
+                <option value="">Select product category</option>
+                {Categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.categoryName}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group className="admin-form-field admin-form-upload full-span">
+              <div className="admin-form-upload-copy">
+                <IoImagesOutline />
+                <div>
+                  <Form.Label>Product Gallery</Form.Label>
+                  <p>Add new images or remove existing ones. Maximum 4 photos.</p>
+                </div>
+              </div>
+              <Form.Control
+                className="admin-form-control"
+                type="file"
+                name="images"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+                ref={imageRef}
+              />
+            </Form.Group>
+          </div>
 
           {previews.length > 0 && (
-            <div className="d-flex flex-wrap gap-2 mb-3">
+            <div className="admin-form-preview-grid">
               {previews.map((src, index) => (
-                <div key={index} className="position-relative">
-                  <MdDelete
+                <div className="admin-form-preview" key={`${src}-${index}`}>
+                  <button
+                    type="button"
+                    className="admin-form-delete"
                     onClick={() => handleOnImageDelete(index)}
-                    className="position-absolute end-0 text-danger cursor-pointer"
-                  />
-                  <img
-                    src={src}
-                    alt="preview"
-                    style={{ width: 100, height: 100, objectFit: "cover" }}
-                  />
+                    aria-label="Remove preview"
+                  >
+                    <MdDelete />
+                  </button>
+                  <img src={src} alt={`Product preview ${index + 1}`} />
                 </div>
               ))}
             </div>
           )}
 
-          <div className="d-grid">
-            <Button type="submit">Update Product</Button>
+          <div className="admin-form-actions">
+            <Button type="submit" className="admin-form-primary">
+              <IoRefreshOutline />
+              Update Product
+            </Button>
           </div>
         </Form>
-      </div>
+      </section>
+
+      <AppDialog
+        show={!!dialog}
+        variant="warning"
+        title={dialog?.title}
+        message={dialog?.message}
+        confirmOnly
+        confirmText="Got It"
+        onConfirm={() => setDialog(null)}
+      />
     </UserLayout>
   );
 };

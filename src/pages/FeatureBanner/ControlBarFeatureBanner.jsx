@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Col, Form, Row } from "react-bootstrap";
 import useForm from "../../hooks/useForm";
 
@@ -50,11 +50,11 @@ const ControlBarFeatureBanner = ({
     const hasDateSort = form.date !== "newest";
 
     setIsFiltering(hasSearch || hasStatusFilter || hasDateSort);
-  }, [form]);
+  }, [form, setIsFiltering]);
 
   useEffect(() => {
     setDisplayData(filterFunctionFeatureBanner(featureBanner, form || {}));
-  }, [form, featureBanner]);
+  }, [form, featureBanner, setDisplayData]);
 
   return (
     <Form>

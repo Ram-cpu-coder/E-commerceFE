@@ -4,7 +4,6 @@ import { Form } from "react-bootstrap";
 const LoginSecurityUpdate = ({ item, form, handleOnChange }) => {
   const { schemaName, data, type } = item;
 
-  console.log(form[schemaName]);
   return (
     <Form className="pb-3">
       <div className="col-sm-10 border px-3 py-1">
@@ -12,8 +11,9 @@ const LoginSecurityUpdate = ({ item, form, handleOnChange }) => {
           type={type}
           name={schemaName}
           className="form-control-plaintext"
-          value={form[schemaName]}
+          value={form[schemaName] ?? data ?? ""}
           onChange={handleOnChange}
+          placeholder={`Enter ${item.label.toLowerCase()}`}
         />
       </div>
     </Form>

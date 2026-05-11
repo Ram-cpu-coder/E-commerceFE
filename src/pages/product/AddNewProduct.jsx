@@ -11,20 +11,29 @@ import {
   getPublicProductAction,
 } from "../../features/products/productActions";
 import { MdDelete } from "react-icons/md";
+import {
+  IoArrowBackOutline,
+  IoCubeOutline,
+  IoImagesOutline,
+  IoSaveOutline,
+} from "react-icons/io5";
 import BreadCrumbsAdmin from "../../components/breadCrumbs/BreadCrumbsAdmin";
 import { setSelectedCategory } from "../../features/category/categorySlice";
-const initialState = {};
+import AppDialog from "../../components/dialogs/AppDialog";
+
+const initialState = { status: "inactive" };
 
 const AddNewProduct = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { form, handleOnChange } = useForm(initialState);
   const { Categories, selectedCategory } = useSelector(
-    (state) => state.categoryInfo
+    (state) => state.categoryInfo,
   );
 
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
+  const [dialog, setDialog] = useState(null);
   const imageRef = useRef(null);
 
   useEffect(() => {
@@ -40,15 +49,17 @@ const AddNewProduct = () => {
 
   const handleImageChange = (e) => {
     const newFiles = Array.from(e.target.files);
-    // Combine existing and new images
+
     if (newFiles.length + images.length <= 4) {
       const updatedFiles = [...images, ...newFiles];
       setImages(updatedFiles);
-      // Generate and append previews
       const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
       setPreviews((prev) => [...prev, ...newPreviews]);
     } else {
-      alert("you can only upload 4 images, ");
+      setDialog({
+        title: "Image limit reached",
+        message: "You can only upload up to 4 product images.",
+      });
       imageRef.current.value = "";
     }
   };
@@ -65,7 +76,7 @@ const AddNewProduct = () => {
     Object.entries(form).forEach(([key, value]) => {
       formData.append(key, value);
     });
-    // Append images
+
     images.forEach((image) => {
       formData.append("images", image);
     });
@@ -76,6 +87,7 @@ const AddNewProduct = () => {
       navigate("/admin/products");
     }
   };
+
   return (
     <UserLayout
       pageTitle={
@@ -88,96 +100,127 @@ const AddNewProduct = () => {
       <div className="mb-3">
         <Link
           to={selectedCategory?._id ? "/admin/categories" : "/admin/products"}
+          className="text-decoration-none"
         >
           <Button
-            variant="secondary"
+            className="admin-form-secondary"
             onClick={() => {
               if (selectedCategory?._id) {
                 dispatch(setSelectedCategory(null));
               }
             }}
           >
-            ← Back
+            <IoArrowBackOutline />
+            Back
           </Button>
         </Link>
       </div>
 
-      <div className="mt-5">
-        {/* form to add new products */}
+      <section className="admin-form-page">
+        <div className="admin-form-hero">
+          <div className="admin-form-hero-icon">
+            <IoCubeOutline />
+          </div>
+          <div>
+            <span className="admin-form-kicker">Product Studio</span>
+            <h2>Add a New Product</h2>
+            <p>
+              Build a polished listing with pricing, stock, category, and up to
+              four gallery images.
+            </p>
+          </div>
+        </div>
 
-        <h4 className="py-4 "> Add new Products Here </h4>
-        <Form onSubmit={handleOnSubmit}>
-          {productInputs?.map((input, i) => (
-            <CustomInput
-              key={i}
-              {...input}
-              onChange={handleOnChange}
-            ></CustomInput>
-          ))}
+        <Form onSubmit={handleOnSubmit} className="admin-form-card">
+          <div className="admin-form-grid">
+            {productInputs?.map((input) => (
+              <CustomInput
+                key={input.name}
+                {...input}
+                fieldClassName={input.name === "description" ? "full-span" : ""}
+                onChange={handleOnChange}
+                value={form[input.name] || ""}
+              />
+            ))}
 
-          {/* Category */}
-          <Form.Group className="mb-3" controlId="category">
-            <Form.Label>Category</Form.Label>
-            <Form.Select
-              name="category"
-              value={form.category}
-              onChange={handleOnChange}
-              required
-              disabled={!!selectedCategory?._id}
-            >
-              <option value="">Select Category</option>
-              {Categories.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.categoryName}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-
-          {/* Image Upload */}
-          <Form.Group className="mb-3" controlId="images">
-            <Form.Label>Upload Images</Form.Label>
-            <Form.Control
-              type="file"
-              name="images"
-              multiple
-              accept=".jpg,.jpeg,.png"
-              onChange={handleImageChange}
-              ref={imageRef}
-            />
-          </Form.Group>
-
-          {/* Image Previews */}
-          {previews.length > 0 && (
-            <>
-              <div className="d-flex flex-wrap gap-2 mb-3">
-                {previews.map((src, index) => (
-                  <div className="d-flex flex-column position-relative ">
-                    <MdDelete
-                      onClick={() => handleOnImageDelete(index)}
-                      className="cursor-pointer text-danger position-absolute end-0 "
-                    />
-                    <img
-                      key={index}
-                      src={src}
-                      alt="Preview"
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
+            <Form.Group className="admin-form-field" controlId="category">
+              <Form.Label>Category</Form.Label>
+              <Form.Select
+                className="admin-form-control"
+                name="category"
+                value={form.category || ""}
+                onChange={handleOnChange}
+                required
+                disabled={!!selectedCategory?._id}
+              >
+                <option value="">Select product category</option>
+                {Categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.categoryName}
+                  </option>
                 ))}
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group
+              className="admin-form-field admin-form-upload full-span"
+              controlId="images"
+            >
+              <div className="admin-form-upload-copy">
+                <IoImagesOutline />
+                <div>
+                  <Form.Label>Product Gallery</Form.Label>
+                  <p>Upload clear JPG or PNG images. Maximum 4 photos.</p>
+                </div>
               </div>
-            </>
+              <Form.Control
+                className="admin-form-control"
+                type="file"
+                name="images"
+                multiple
+                accept=".jpg,.jpeg,.png"
+                onChange={handleImageChange}
+                ref={imageRef}
+              />
+            </Form.Group>
+          </div>
+
+          {previews.length > 0 && (
+            <div className="admin-form-preview-grid">
+              {previews.map((src, index) => (
+                <div className="admin-form-preview" key={`${src}-${index}`}>
+                  <button
+                    type="button"
+                    className="admin-form-delete"
+                    onClick={() => handleOnImageDelete(index)}
+                    aria-label="Remove preview"
+                  >
+                    <MdDelete />
+                  </button>
+                  <img src={src} alt={`Product preview ${index + 1}`} />
+                </div>
+              ))}
+            </div>
           )}
 
-          <div className="d-grid">
-            <Button type="submit"> Submit new Product </Button>
+          <div className="admin-form-actions">
+            <Button type="submit" className="admin-form-primary">
+              <IoSaveOutline />
+              Submit Product
+            </Button>
           </div>
         </Form>
-      </div>
+      </section>
+
+      <AppDialog
+        show={!!dialog}
+        variant="warning"
+        title={dialog?.title}
+        message={dialog?.message}
+        confirmOnly
+        confirmText="Got It"
+        onConfirm={() => setDialog(null)}
+      />
     </UserLayout>
   );
 };

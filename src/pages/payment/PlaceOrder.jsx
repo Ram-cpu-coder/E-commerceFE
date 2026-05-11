@@ -1,63 +1,45 @@
 import React, { useState } from "react";
-import { Table } from "react-bootstrap";
 import Review from "../review/Review";
 
 const PlaceOrder = ({ item }) => {
-  const { products } = item;
+  const { products = [] } = item || {};
   const [isReviewing, setIsReviewing] = useState(null);
 
-  console.log(products, 99);
   const handleToggleReview = (id) => {
     setIsReviewing((prevId) => (prevId === id ? null : id));
   };
 
   return (
-    <Table
-      hover
-      responsive
-      className="col-sm-10 col-12"
-      style={{ minWidth: "60vw" }}
-    >
-      <thead className="text-start">
-        <tr>
-          <th>Image</th>
-          <th>Product</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody className="text-start">
-        {products.map((product, i) => (
-          <tr key={product._id}>
-            <td style={{ maxWidth: "50px" }}>
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                height={50}
-                width={50}
-                className="rounded d-block"
-              />
-            </td>
-            <td style={{ width: "600px" }}>
-              <b>{product.name}</b>
-            </td>
-            <td style={{ width: "100px" }}>
-              $ {product.price * product.quantity}
-            </td>
-            <td style={{ width: "100px" }}>{product.quantity}</td>
+    <div className="placed-order-items">
+      {products.map((product) => {
+        const image = product.images?.[0] || product.image || "/placeholder-image.png";
+        const lineTotal = Number(product.price || 0) * Number(product.quantity || 1);
 
-            <td className="">
+        return (
+          <article className="placed-order-item" key={product._id || product.id}>
+            <img
+              src={image}
+              alt={product.name || "Ordered product"}
+              onError={(e) => {
+                e.currentTarget.src = "/placeholder-image.png";
+              }}
+            />
+            <div className="placed-order-item-copy">
+              <strong>{product.name}</strong>
+              <span>Qty {product.quantity || 1}</span>
+            </div>
+            <div className="placed-order-item-total">
+              <strong>$ {lineTotal.toFixed(2)}</strong>
               <Review
-                productId={product._id}
+                productId={product._id || product.id}
                 isReviewing={isReviewing}
                 handleToggleReview={handleToggleReview}
               />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+            </div>
+          </article>
+        );
+      })}
+    </div>
   );
 };
 

@@ -3,6 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
 import { MdDelete } from "react-icons/md";
+import {
+  IoGridOutline,
+  IoImagesOutline,
+  IoRefreshOutline,
+} from "react-icons/io5";
 import { UserLayout } from "../../../components/layouts/UserLayout";
 import BreadCrumbsAdmin from "../../../components/breadCrumbs/BreadCrumbsAdmin";
 import { updateCategoryAction } from "../../../features/category/CategoryActions";
@@ -30,7 +35,7 @@ const EditCategory = () => {
 
   useEffect(() => {
     if (selectedCategory?._id) {
-      const { _id, createdAt, updatedAt, __v, ...cleaned } = selectedCategory;
+      const { _id, __v, ...cleaned } = selectedCategory;
       setForm(cleaned);
       setCategoryImagePreview(cleaned.categoryImage || "");
       setFeatureImagePreview(cleaned.featureImageUrl || "");
@@ -86,7 +91,7 @@ const EditCategory = () => {
     }
 
     const result = await dispatch(
-      updateCategoryAction(selectedCategory._id, formData)
+      updateCategoryAction(selectedCategory._id, formData),
     );
     if (result === "success") {
       navigate("/admin/categories");
@@ -96,91 +101,119 @@ const EditCategory = () => {
   return (
     <UserLayout pageTitle={`Edit ${selectedCategory?.categoryName} Category`}>
       <BreadCrumbsAdmin />
-      <div className="">
-        <h4 className="py-4">Edit Category</h4>
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Category Name</Form.Label>
-            <Form.Control
-              name="categoryName"
-              value={form.categoryName}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
+      <section className="admin-form-page">
+        <div className="admin-form-hero">
+          <div className="admin-form-hero-icon">
+            <IoGridOutline />
+          </div>
+          <div>
+            <span className="admin-form-kicker">Category Editor</span>
+            <h2>Edit Category</h2>
+            <p>
+              Keep the category title, card image, and feature artwork aligned
+              with the storefront.
+            </p>
+          </div>
+        </div>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Display Title</Form.Label>
-            <Form.Control
-              name="displaytitle"
-              value={form.displaytitle}
-              onChange={handleChange}
-            />
-          </Form.Group>
+        <Form onSubmit={handleSubmit} className="admin-form-card">
+          <div className="admin-form-grid">
+            <Form.Group className="admin-form-field">
+              <Form.Label>Category Name</Form.Label>
+              <Form.Control
+                className="admin-form-control"
+                name="categoryName"
+                value={form.categoryName}
+                onChange={handleChange}
+                placeholder="e.g. Modern Living"
+                required
+              />
+            </Form.Group>
 
-          {/* Category Image Upload */}
-          <Form.Group className="mb-3">
-            <Form.Label>Upload Category Image</Form.Label>
-            <Form.Control
-              type="file"
-              accept="image/*"
-              onChange={handleCategoryImageChange}
-              ref={categoryImageRef}
-            />
-            {categoryImagePreview && (
-              <div className="position-relative mt-2">
-                <MdDelete
-                  onClick={handleDeleteCategoryImage}
-                  className="position-absolute  text-danger cursor-pointer"
-                />
-                <img
-                  src={categoryImagePreview}
-                  alt="Category Preview"
-                  style={{
-                    width: 120,
-                    height: 120,
-                    objectFit: "cover",
-                    borderRadius: 8,
-                  }}
-                />
+            <Form.Group className="admin-form-field">
+              <Form.Label>Display Title</Form.Label>
+              <Form.Control
+                className="admin-form-control"
+                name="displaytitle"
+                value={form.displaytitle}
+                onChange={handleChange}
+                placeholder="e.g. Elevated pieces for everyday spaces"
+              />
+            </Form.Group>
+
+            <Form.Group className="admin-form-field admin-form-upload">
+              <div className="admin-form-upload-copy">
+                <IoImagesOutline />
+                <div>
+                  <Form.Label>Category Image</Form.Label>
+                  <p>Replace or remove the card image for this category.</p>
+                </div>
               </div>
-            )}
-          </Form.Group>
+              <Form.Control
+                className="admin-form-control"
+                type="file"
+                accept="image/*"
+                onChange={handleCategoryImageChange}
+                ref={categoryImageRef}
+              />
+              {categoryImagePreview && (
+                <div className="admin-form-preview-grid compact">
+                  <div className="admin-form-preview">
+                    <button
+                      type="button"
+                      className="admin-form-delete"
+                      onClick={handleDeleteCategoryImage}
+                      aria-label="Remove category image"
+                    >
+                      <MdDelete />
+                    </button>
+                    <img src={categoryImagePreview} alt="Category preview" />
+                  </div>
+                </div>
+              )}
+            </Form.Group>
 
-          {/* Feature Image Upload */}
-          <Form.Group className="mb-3">
-            <Form.Label>Upload Feature Image</Form.Label>
-            <Form.Control
-              type="file"
-              accept="image/*"
-              onChange={handleFeatureImageChange}
-              ref={featureImageRef}
-            />
-            {featureImagePreview && (
-              <div className="position-relative mt-2">
-                <MdDelete
-                  onClick={handleDeleteFeatureImage}
-                  className="position-absolute end-0 text-danger cursor-pointer"
-                />
-                <img
-                  src={featureImagePreview}
-                  alt="Feature Preview"
-                  style={{
-                    width: 120,
-                    height: 120,
-                    objectFit: "cover",
-                    borderRadius: 8,
-                  }}
-                />
+            <Form.Group className="admin-form-field admin-form-upload">
+              <div className="admin-form-upload-copy">
+                <IoImagesOutline />
+                <div>
+                  <Form.Label>Feature Image</Form.Label>
+                  <p>Replace or remove the wide feature visual.</p>
+                </div>
               </div>
-            )}
-          </Form.Group>
+              <Form.Control
+                className="admin-form-control"
+                type="file"
+                accept="image/*"
+                onChange={handleFeatureImageChange}
+                ref={featureImageRef}
+              />
+              {featureImagePreview && (
+                <div className="admin-form-preview-grid compact">
+                  <div className="admin-form-preview">
+                    <button
+                      type="button"
+                      className="admin-form-delete"
+                      onClick={handleDeleteFeatureImage}
+                      aria-label="Remove feature image"
+                    >
+                      <MdDelete />
+                    </button>
+                    <img src={featureImagePreview} alt="Feature preview" />
+                  </div>
+                </div>
+              )}
+            </Form.Group>
+          </div>
 
-          <div className="d-grid">
-            <Button type="submit">Update Category</Button>
+          <div className="admin-form-actions">
+            <Button type="submit" className="admin-form-primary">
+              <IoRefreshOutline />
+              Update Category
+            </Button>
           </div>
         </Form>
-      </div>
+      </section>
     </UserLayout>
   );
 };

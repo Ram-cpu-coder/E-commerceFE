@@ -21,6 +21,7 @@ const ProductsImages = lazy(() => import("./ProductsImages"));
 const ProductsDetails = lazy(() => import("./ProductsDetails"));
 const ProductReviews = lazy(() => import("./ProductReviews"));
 const ShareProduct = lazy(() => import("./ShareProduct"));
+const Description = lazy(() => import("./Description"));
 
 const calculateAvgRating = (reviews) => {
   if (!reviews?.length) return 1;
@@ -33,7 +34,7 @@ const ProductLandingPage = () => {
   const { id } = useParams();
 
   const { selectedProduct } = useSelector((state) => state.productInfo);
-  const { allPubReviews } = useSelector((state) => state.reviewInfo);
+  const { allPubReviews, selectedReview } = useSelector((state) => state.reviewInfo);
   const { wishlist } = useSelector((state) => state.wishlistSliceInfo);
   const { user } = useSelector((state) => state.userInfo);
 
@@ -63,10 +64,7 @@ const ProductLandingPage = () => {
         await dispatch(getSingleProductAction(id));
       }
 
-      // 2. Fetch reviews only if not already fetched for this product
-      if (!allPubReviews?.some((r) => r.productId === id)) {
-        await dispatch(getPubReviewAction(id));
-      }
+      await dispatch(getPubReviewAction(id));
 
       // 3. Fetch wishlist only if user exists and wishlist is empty
       if (user?._id && wishlist.length === 0) {
@@ -85,7 +83,6 @@ const ProductLandingPage = () => {
     dispatch,
     id,
     selectedProduct,
-    allPubReviews,
     user?._id,
     wishlist.length,
   ]);
@@ -98,8 +95,15 @@ const ProductLandingPage = () => {
 
   // --- Filter reviews for current product ---
   const itemReviews = useMemo(
-    () => allPubReviews?.filter((r) => r.productId === id) || [],
-    [allPubReviews, id]
+    () => {
+      const apiReviews = selectedReview?.docs || selectedReview?.reviews || [];
+      const productReviews = selectedProduct?.reviews || [];
+      const publicReviews = allPubReviews?.filter((r) => r.productId === id) || [];
+      const reviews = apiReviews.length ? apiReviews : productReviews.length ? productReviews : publicReviews;
+
+      return reviews.filter((review) => String(review.productId) === String(id));
+    },
+    [allPubReviews, id, selectedProduct?.reviews, selectedReview]
   );
 
   const avgRating = useMemo(
@@ -153,7 +157,7 @@ const ProductLandingPage = () => {
 
   return (
     <div className="product-page-shell">
-      <div className="product-page-hero">
+      <div className="product-page-hero product-page-container">
         <div>
           <p className="section-kicker">Product detail</p>
           <h1>{selectedProduct.name}</h1>
@@ -164,7 +168,7 @@ const ProductLandingPage = () => {
         </div>
       </div>
       <div className="d-flex align-items-center w-100 flex-column gap-4 mb-5">
-        <div className="d-flex flex-column flex-lg-row justify-content-around align-items-start container col-11 col-xl-9 col-lg-10 col-md-12 product-detail-shell">
+        <div className="product-page-container product-detail-shell product-detail-grid">
           <Suspense
             fallback={
               <Box sx={{ width: 300, height: 300, m: 2 }}>
@@ -186,8 +190,14 @@ const ProductLandingPage = () => {
           </Suspense>
         </div>
 
+        <div className="product-page-container product-description-shell">
+          <Suspense fallback={<div>Loading description...</div>}>
+            <Description description={selectedProduct.description} />
+          </Suspense>
+        </div>
+
         {showReviews && (
-          <div className="d-flex flex-column flex-md-row justify-content-around align-items-start container col-11 col-xl-9 col-lg-10 col-md-12 review-shell">
+          <div className="product-page-container review-shell">
             <Suspense fallback={<div>Loading Reviews...</div>}>
               <ProductReviews selectedProduct={selectedProduct} />
             </Suspense>

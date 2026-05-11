@@ -4,12 +4,18 @@ import { useDispatch } from "react-redux";
 import { updateOrderAction } from "../../features/orders/orderActions";
 import { IoBarcodeOutline, IoCalendarClearOutline } from "react-icons/io5";
 
+const formatOrderDate = (value) => {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "Date unavailable"
+    : date.toLocaleDateString();
+};
+
 const TopPart = ({ item, user }) => {
   const dispatch = useDispatch();
   const [showText, setShowText] = useState(false);
   // order status
   const handleOnStatus = async (e, id) => {
-    console.log(e.target.value);
     await dispatch(updateOrderAction({ _id: id, status: e.target.value }));
   };
   useEffect(() => {
@@ -58,7 +64,7 @@ const TopPart = ({ item, user }) => {
       <div className="order-card-status">
         <span className="order-date">
           <IoCalendarClearOutline aria-hidden />
-          {new Date(item.createdAt).toLocaleDateString()}
+          {formatOrderDate(item.createdAt)}
         </span>
         {user.role === "admin" ? (
           <select

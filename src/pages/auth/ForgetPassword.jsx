@@ -1,10 +1,11 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { Form } from "react-bootstrap";
 import OTPForm from "../../components/ForgotPassword/OTPForm";
 import VerifyEmail from "../../components/ForgotPassword/VerifyEmail";
 import UpdatePassword from "../../components/ForgotPassword/UpdatePassword";
 import useform from "../../hooks/useForm";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { IoLockClosedOutline, IoMailOutline, IoShieldCheckmarkOutline } from "react-icons/io5";
 
 const ForgetPassword = () => {
   const [heading, setHeading] = useState("Verify Your Email");
@@ -21,13 +22,24 @@ const ForgetPassword = () => {
   });
   const from = location.state?.from?.pathname || "/login";
   return (
-    <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ minHeight: "50vh" }}
-    >
-      <div className="d-flex w-lg-100 w-md-75 w-sm-50 mx-2 justify-content-center align-items-center py-4 px-5 border">
-        <Form className="d-flex flex-column">
-          <h1 className="text-center">{heading}</h1>
+    <div className="forgot-password-page">
+      <section className="forgot-password-card">
+        <div className="forgot-password-icon">
+          {isPassword ? (
+            <IoLockClosedOutline aria-hidden />
+          ) : isVerifyOtpUI ? (
+            <IoShieldCheckmarkOutline aria-hidden />
+          ) : (
+            <IoMailOutline aria-hidden />
+          )}
+        </div>
+        <p className="section-kicker">Account recovery</p>
+        <h1>{heading}</h1>
+        <p className="forgot-password-copy">
+          We will verify your email with a one-time code before allowing a new
+          password.
+        </p>
+        <Form className="forgot-password-form">
           <VerifyEmail
             handleOnChange={handleOnChange}
             form={form}
@@ -49,7 +61,10 @@ const ForgetPassword = () => {
             from={from}
           />
         </Form>
-      </div>
+        <Link className="forgot-password-back" to="/login">
+          Back to login
+        </Link>
+      </section>
     </div>
   );
 };

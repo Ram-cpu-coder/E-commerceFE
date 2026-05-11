@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Col, Form, Row } from "react-bootstrap";
 
 const ControlBarReview = ({ form, handleOnChange }) => {

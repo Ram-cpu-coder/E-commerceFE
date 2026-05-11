@@ -10,23 +10,25 @@ const Stars = ({ avgRating }) => {
   const halfStar = !Number.isInteger(avgRating);
   const emptyStar = MAXRATING - fullStars - (halfStar ? 1 : 0);
 
-  const Stars = [];
+  const stars = [];
 
   for (let i = 1; i <= fullStars; i++) {
-    Stars.push(<IoStar className="text-warning" />);
+    stars.push(<IoStar className="text-warning" key={`full-${i}`} />);
   }
   halfStar &&
-    Stars.push(<IoStarHalfOutline className="text-warning text-secondary" />);
+    stars.push(
+      <IoStarHalfOutline className="text-warning text-secondary" key="half" />
+    );
 
   if (emptyStar) {
     for (let i = 1; i <= emptyStar; i++) {
-      Stars.push(<IoStarOutline className="text-warning" />);
+      stars.push(<IoStarOutline className="text-warning" key={`empty-${i}`} />);
     }
   }
   return (
     <div className="d-flex align-items-center" style={{ maxHeight: "20px", fontSize:"15px"}}>
       <div className="d-flex align-items-center">
-        {Stars.map((item, index) => item)}
+        {stars}
       </div>
     </div>
   );

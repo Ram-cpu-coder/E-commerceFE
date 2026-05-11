@@ -2,14 +2,10 @@ import React from "react";
 import Stars from "../rating/Stars";
 
 const ProductReviewCard = ({ item }) => {
-  console.log(item, 99);
-  console.log("hello");
   const {
     comment,
     createdAt,
     email,
-    productImage,
-    productName,
     rating,
     userImage,
     userName,
@@ -26,7 +22,9 @@ const ProductReviewCard = ({ item }) => {
           <div>
             <strong className="fs-5">{userName}</strong>
             <p className="m-0 text-secondary">{email}</p>
-            <p className="m-0 text-secondary">{createdAt.split("T")[0]}</p>
+            <p className="m-0 text-secondary">
+              {createdAt ? createdAt.split("T")[0] : ""}
+            </p>
           </div>
         </div>
         <div className="text-nowrap">

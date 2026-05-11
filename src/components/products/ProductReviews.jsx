@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import ProductReviewCard from "./ProductReviewCard";
 import { Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,13 +18,23 @@ const ProductReviews = ({ selectedProduct }) => {
       await dispatch(getPubReviewAction(selectedProduct._id));
     };
     fetchReviews();
-  }, [selectedProduct._id, reviewCustomerPage]);
-  if (!selectedReview) {
+  }, [dispatch, selectedProduct._id, reviewCustomerPage]);
+
+  const reviewDocs = useMemo(() => {
+    const apiReviews = selectedReview?.docs || selectedReview?.reviews || [];
+    const productReviews = selectedProduct?.reviews || [];
+    const reviews = apiReviews.length ? apiReviews : productReviews;
+
+    return reviews.filter(
+      (review) => String(review.productId) === String(selectedProduct._id)
+    );
+  }, [selectedReview, selectedProduct?._id, selectedProduct?.reviews]);
+
+  if (!selectedReview && !selectedProduct?.reviews) {
     return (
       <Backdrop
         sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
-        open={open}
-        onClick={handleClose}
+        open
       >
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -34,13 +44,13 @@ const ProductReviews = ({ selectedProduct }) => {
     <div className="container mt-4">
       <h1 className="text-start w-100">Latest Reviews</h1>
 
-      {!selectedReview?.reviews?.length ? (
+      {!reviewDocs?.length ? (
         <div className="text-center">No Reviews yet</div>
       ) : (
         <>
           <Row className="g-4">
-            {selectedReview?.reviews?.map((item, index) => (
-              <Col key={index} xs={12} sm={12} md={6} lg={6} xl={4}>
+            {reviewDocs.map((item) => (
+              <Col key={item._id} xs={12} sm={12} md={6} lg={6} xl={4}>
                 <ProductReviewCard item={item} />
               </Col>
             ))}

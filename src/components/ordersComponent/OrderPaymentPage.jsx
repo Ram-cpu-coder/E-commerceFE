@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { makePaymentAction } from "../../features/payment/PaymentActions";
 import { toast } from "react-toastify";
 import OrderSummaryCard from "./OrderSummaryCard";
+import { IoBagCheckOutline, IoCardOutline, IoRefreshOutline } from "react-icons/io5";
 
 const OrderFinalPage = ({
   setConfirmation,
@@ -18,13 +19,15 @@ const OrderFinalPage = ({
 
   const { cart } = useSelector((state) => state.cartInfo);
 
-  const priceArr = cart.map((item) => item.totalAmount);
+  const subtotal = cart.reduce((total, item) => total + Number(item.totalAmount || 0), 0);
 
   const handleOrderConfirmationAndInitiatePayment = async () => {
     try {
       const data = await dispatch(makePaymentAction());
-      setClientSecret(data?.paymentIntent?.client_secret);
-    } catch (error) {
+      if (data?.paymentIntent?.client_secret) {
+        setClientSecret(data.paymentIntent.client_secret);
+      }
+    } catch {
       toast.error("Something went wrong during checkout");
     }
   };
@@ -34,63 +37,70 @@ const OrderFinalPage = ({
   );
 
   return (
-    <div className="row col-12 col-md-8 col-lg-7 vh-auto mb-5 pb-5">
-      <div className="container d-flex justify-content-center gap-3 mb-5 pb-5">
-        <section className={`${clientSecret ? "col-6" : "col-12"}`}>
-          <h5>Order Summary</h5>
+    <div className="checkout-payment-grid">
+      <section className="checkout-panel checkout-summary-panel">
+        <div className="checkout-panel-heading">
+          <span><IoBagCheckOutline aria-hidden /></span>
+          <div>
+            <p className="section-kicker">Order summary</p>
+            <h2>Review your cart</h2>
+          </div>
+        </div>
 
-          <div className="d-flex flex-column align-items-center bg-white py-3 position-relative vh-100">
-            <div className="col-12">
+        <div className="checkout-summary-list">
+          {cart?.length ? (
+            <>
               {cart.map((item, index) => (
                 <OrderSummaryCard item={item} key={index} />
               ))}
-            </div>
+            </>
+          ) : (
+            <div className="checkout-empty-cart">Your cart is empty.</div>
+          )}
+        </div>
 
-            <span className="d-flex justify-content-between col-11">
-              <strong>Total</strong>
-              <p>$ {priceArr.reduce((ttl, acc) => ttl + acc, 0)}</p>
-            </span>
+        <div className="checkout-totals">
+          <span><strong>Subtotal</strong><p>$ {subtotal.toFixed(2)}</p></span>
+          <span><strong>Shipping</strong><p>$ 0.00</p></span>
+          <span><strong>Tax</strong><p>$ 0.00</p></span>
+          <span className="grand-total"><strong>Total</strong><p>$ {subtotal.toFixed(2)}</p></span>
+        </div>
 
-            <span className="d-flex justify-content-between col-11">
-              <strong>Shipping</strong>
-              <p>0</p>
-            </span>
-
-            <span className="d-flex justify-content-between col-11">
-              <strong>Tax</strong>
-              <p>0</p>
-            </span>
-
-            <span className="d-flex justify-content-between col-11">
-              <strong>SubTotal</strong>
-              <p>$ {priceArr.reduce((ttl, acc) => ttl + acc, 0)}</p>
-            </span>
-
-            {clientSecret ? (
-              ""
-            ) : (
-              <Button
-                onClick={() => handleOrderConfirmationAndInitiatePayment()}
-              >
-                Confirm
-              </Button>
-            )}
-          </div>
-        </section>
-
-        {clientSecret && (
-          <section className="w-50 border-start px-3">
-            <h5 className="pb-4">Payment</h5>
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <CheckOutForm
-                setConfirmation={setConfirmation}
-                setActiveStep={setActiveStep}
-                setAddressConfirmed={setAddressConfirmed}
-              />
-            </Elements>
-          </section>
+        {!clientSecret && (
+          <Button
+            className="checkout-primary-button"
+            onClick={() => handleOrderConfirmationAndInitiatePayment()}
+            disabled={!cart?.length}
+          >
+            <IoRefreshOutline aria-hidden /> Check stock and continue
+          </Button>
         )}
-      </div>
+      </section>
+
+      <section className="checkout-panel checkout-payment-panel">
+        <div className="checkout-panel-heading">
+          <span><IoCardOutline aria-hidden /></span>
+          <div>
+            <p className="section-kicker">Payment</p>
+            <h2>{clientSecret ? "Enter payment details" : "Ready when stock is confirmed"}</h2>
+          </div>
+        </div>
+
+        {clientSecret ? (
+          <Elements stripe={stripePromise} options={{ clientSecret }}>
+            <CheckOutForm
+              setConfirmation={setConfirmation}
+              setActiveStep={setActiveStep}
+              setAddressConfirmed={setAddressConfirmed}
+            />
+          </Elements>
+        ) : (
+          <div className="checkout-payment-placeholder">
+            Stripe payment fields will appear here after the latest stock and
+            pricing check passes.
+          </div>
+        )}
+      </section>
     </div>
   );
 };

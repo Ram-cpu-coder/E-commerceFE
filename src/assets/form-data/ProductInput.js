@@ -5,7 +5,7 @@ export const productInputs = [
     name: "name",
     type: "text",
     required: true,
-    placeholder: "e.g. Cotton T-Shirt",
+    placeholder: "e.g. Nova Linen Overshirt",
   },
   {
     label: "Description",
@@ -13,7 +13,7 @@ export const productInputs = [
     type: "text",
     as: "textarea",
     maxLength: 500,
-    placeholder: "Product description...",
+    placeholder: "Highlight the material, fit, finish, and the reason customers will love it.",
     rows: 4,
   },
   {
@@ -21,7 +21,7 @@ export const productInputs = [
     name: "price",
     type: "number",
     required: true,
-    placeholder: "e.g. 29.99",
+    placeholder: "e.g. 79.99",
     min: 0,
     step: "0.01",
   },
@@ -29,7 +29,7 @@ export const productInputs = [
     label: "Stock",
     name: "stock",
     type: "number",
-    placeholder: "e.g. 100",
+    placeholder: "e.g. 48",
     min: 1,
   },
   {
@@ -38,7 +38,6 @@ export const productInputs = [
     type: "select",
     options: ["active", "inactive"],
     required: true,
-    defaultValue: "inactive",
   },
 //   {
 //     label: "Category",

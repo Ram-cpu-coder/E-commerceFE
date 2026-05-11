@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { MdOutlineAddBox } from "react-icons/md";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setMenu } from "../../features/user/userSlice";
 import { UserLayout } from "../../components/layouts/UserLayout";
@@ -11,6 +10,7 @@ const ProductList = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.userInfo);
   const { selectedCategory } = useSelector((state) => state.categoryInfo);
+  const { products } = useSelector((state) => state.productInfo);
   useEffect(() => {
     dispatch(setMenu("Products"));
   }, [dispatch]);
@@ -22,6 +22,20 @@ const ProductList = () => {
   return (
     <UserLayout pageTitle={selectedCategory?.categoryName || "Products"}>
       <BreadCrumbsAdmin />
+      <section className="admin-products-hero">
+        <div>
+          <p className="section-kicker">Inventory control</p>
+          <h2>{selectedCategory?.categoryName || "Product catalog"}</h2>
+          <p>
+            Manage catalog visibility, stock levels, pricing, categories, and
+            product details from one focused admin workspace.
+          </p>
+        </div>
+        <div className="admin-products-count">
+          <strong>{products?.totalDocs || products?.docs?.length || 0}</strong>
+          <span>Products</span>
+        </div>
+      </section>
       <ProductTable />
     </UserLayout>
   );

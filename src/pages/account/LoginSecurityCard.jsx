@@ -12,7 +12,16 @@ const LoginSecurityCard = ({ item }) => {
   const navigate = useNavigate();
 
   const handleOnUpdate = (obj) => {
-    dispatch(updateUserAction(obj));
+    const payload = { ...obj };
+
+    if (item.schemaName === "fullName" && payload.fullName) {
+      const [fName, ...lastNameParts] = payload.fullName.trim().split(" ");
+      payload.fName = fName;
+      payload.lName = lastNameParts.join(" ") || item.data.split(" ").slice(1).join(" ");
+      delete payload.fullName;
+    }
+
+    dispatch(updateUserAction(payload));
 
     setForm({});
     setIsUpdating(false);

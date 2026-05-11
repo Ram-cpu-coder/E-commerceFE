@@ -1,3 +1,10 @@
+const formatOrderDate = (value) => {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "Date unavailable"
+    : date.toLocaleDateString();
+};
+
 const ImageSection = ({ item, isOpen, toggleAccordion }) => {
   return (
     <div className="order-card-products">
@@ -20,7 +27,7 @@ const ImageSection = ({ item, isOpen, toggleAccordion }) => {
         <div className="order-products-meta">
           <div className="order-updated-card">
             <span>Updated</span>
-            <strong>{new Date(item?.updatedAt).toLocaleDateString()}</strong>
+            <strong>{formatOrderDate(item?.updatedAt || item?.createdAt)}</strong>
           </div>
           {toggleAccordion && (
             <button

@@ -1,4 +1,5 @@
 import { AiFillDelete } from "react-icons/ai";
+import { IoCheckmarkCircleOutline, IoTimeOutline } from "react-icons/io5";
 import { useDispatch } from "react-redux";
 import Stars from "../../components/rating/Stars";
 import { Button, Form } from "react-bootstrap";
@@ -27,57 +28,58 @@ const ReviewRow = ({ allReviews }) => {
 
   return allReviews.map((review) => {
     return (
-      <tr key={review._id} style={{ width: "100%" }}>
-        <td className="col-1">
-          <img
-            src={review.productImage}
-            alt="Image"
-            className="border"
-            style={{ maxHeight: "2.5rem", maxWidth: "2.5rem" }}
-          />
-        </td>
-        <td className="col-1">
-          <Form>
+      <tr key={review._id}>
+        <td>
+          <div className={`review-status-pill ${review.approved ? "approved" : "pending"}`}>
+            {review.approved ? <IoCheckmarkCircleOutline aria-hidden /> : <IoTimeOutline aria-hidden />}
+            <span>{review.approved ? "Approved" : "Pending"}</span>
             <Form.Check
               type="switch"
-              id="custom-switch"
+              id={`review-status-${review._id}`}
               onChange={handleOnStatusOfReview}
               value={review._id}
-              label=""
-              checked={review.approved}
+              label={null}
+              checked={Boolean(review.approved)}
             />
-          </Form>
+          </div>
         </td>
-        <td className="col-4" style={{ minWidth: "300px" }}>
-          {review.productName}
-        </td>
-        <td className="col-2">
-          <div
-            className="d-flex gap-2 align-items-center flex-wrap"
-            style={{ maxWidth: "300px", minWidth: "0" }}
-          >
+        <td>
+          <div className="review-product-cell">
             <img
-              src={review.userImage || "/default.png"}
-              alt="Image"
-              style={{ maxHeight: "2.5em", maxWidth: "2.5em" }}
-            />
-            <div
-              style={{
-                minWidth: 0,
-                overflowWrap: "break-word",
+              src={review.productImage || "/placeholder-image.png"}
+              alt={review.productName || "Product"}
+              onError={(e) => {
+                e.currentTarget.src = "/placeholder-image.png";
               }}
-            >
-              <strong>{review.userName}</strong>
+            />
+            <div>
+              <strong>{review.productName || "Unknown product"}</strong>
+              <small>{review.productId}</small>
             </div>
           </div>
         </td>
-        <td className="col-1">
+        <td>
+          <div className="review-user-cell">
+            <img
+              src={review.userImage || "/default.png"}
+              alt={review.userName || "User"}
+            />
+            <div>
+              <strong>{review.userName || "Customer"}</strong>
+              <small>{review.email}</small>
+            </div>
+          </div>
+        </td>
+        <td>
           <Stars avgRating={review.rating} />
         </td>
-        <td className="col-3">{review.comment}</td>
-        <td className="col-3">
+        <td>
+          <p className="review-comment">{review.comment}</p>
+        </td>
+        <td>
           <Button
-            variant="danger"
+            variant="link"
+            className="review-delete-button"
             title="Delete"
             onClick={() => handleDeleteReview(review._id)}
           >

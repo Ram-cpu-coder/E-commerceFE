@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Form,
-  Row,
-} from "react-bootstrap";
+import { Button, Col, Form, Row } from "react-bootstrap";
 import Table from "react-bootstrap/Table";
-import { MdOutlineAddBox } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import useForm from "../../hooks/useForm";
 import { filterFunction } from "../../utils/filterProducts.js";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { IoAddCircleOutline, IoSearchOutline } from "react-icons/io5";
 import {
   deleteProductAction,
   getAdminProductAction,
@@ -22,14 +15,15 @@ import {
 } from "../../features/products/productActions.js";
 import { setSelectedCategory } from "../../features/category/categorySlice.js";
 import PaginationRounded from "../../components/pagination/PaginationRounded.jsx";
+import AppDialog from "../../components/dialogs/AppDialog.jsx";
 
 export const ProductTable = () => {
-  const { selectedCategory } = useSelector((state) => state.categoryInfo);
-
+  const { selectedCategory, Categories } = useSelector(
+    (state) => state.categoryInfo
+  );
   const { products, allAdminProducts, productAdminPage } = useSelector(
     (state) => state.productInfo
   );
-  const { Categories } = useSelector((state) => state.categoryInfo);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -42,6 +36,7 @@ export const ProductTable = () => {
 
   const [displayProducts, setDisplayProducts] = useState([]);
   const [isFiltering, setIsFiltering] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   useEffect(() => {
     const isActive =
@@ -60,14 +55,15 @@ export const ProductTable = () => {
         await dispatch(getAdminProductAction());
       }
     };
+
     fetchAdminProducts();
-  }, [isFiltering, productAdminPage]);
+  }, [dispatch, isFiltering, productAdminPage]);
 
   useEffect(() => {
     if (selectedCategory?._id) {
       setForm((prev) => ({ ...prev, category: selectedCategory._id }));
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, setForm]);
 
   useEffect(() => {
     const data = isFiltering ? allAdminProducts : products?.docs;
@@ -78,11 +74,15 @@ export const ProductTable = () => {
     const category = Categories.find((item) => item._id === categoryId);
     return category?.categoryName;
   };
-  // search Form handling
-  const handleOnDelete = (_id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      dispatch(deleteProductAction(_id));
-    }
+
+  const handleOnDelete = (product) => {
+    setProductToDelete(product);
+  };
+
+  const confirmProductDelete = async () => {
+    if (!productToDelete?._id) return;
+    await dispatch(deleteProductAction(productToDelete._id));
+    setProductToDelete(null);
   };
 
   const handleGoBack = () => {
@@ -91,30 +91,34 @@ export const ProductTable = () => {
   };
 
   return (
-    <>
-      {isFiltering && (
-        <p className="text-muted small">Showing filtered results</p>
-      )}
-      {selectedCategory?._id && (
-        <div className="mb-3 p-2 ">
-          <Button variant="dark" onClick={handleGoBack}>
-            ← Back to Categories
+    <div className="admin-products-shell">
+      <div className="admin-products-topline">
+        {isFiltering ? (
+          <p className="text-muted small mb-0">Showing filtered results</p>
+        ) : (
+          <p className="text-muted small mb-0">Showing latest catalog results</p>
+        )}
+        {selectedCategory?._id && (
+          <Button className="admin-product-button ghost" onClick={handleGoBack}>
+            Back to Categories
           </Button>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* controls */}
-      <Form>
-        <Row>
-          <Col md={6}>
-            <Form.Control
-              name="searchQuery"
-              type="text"
-              placeholder="Search Products ..."
-              onChange={handleOnChange}
-            />
+      <Form className="admin-products-controls">
+        <Row className="g-3 align-items-center">
+          <Col lg={5}>
+            <div className="admin-product-search">
+              <IoSearchOutline aria-hidden />
+              <Form.Control
+                name="searchQuery"
+                type="text"
+                placeholder="Search products..."
+                onChange={handleOnChange}
+              />
+            </div>
           </Col>
-          <Col className="d-flex justify-content-center gap-1 gap-sm-2">
+          <Col className="d-flex justify-content-lg-end gap-2 flex-wrap">
             {!selectedCategory?._id && (
               <Form.Group>
                 <Form.Select
@@ -122,7 +126,7 @@ export const ProductTable = () => {
                   value={form.category}
                   onChange={handleOnChange}
                 >
-                  <option value="all">All Category</option>
+                  <option value="all">All Categories</option>
                   {Categories.map((cat) => (
                     <option key={cat._id} value={cat._id}>
                       {cat.categoryName}
@@ -139,98 +143,99 @@ export const ProductTable = () => {
                 onChange={handleOnChange}
               >
                 <option value="newest">Newest</option>
-                <option value="toHigh">Price : Low to High</option>
-                <option value="toLow">Price : High to Low </option>
-                <option value="toZ">Name : A to Z </option>
-                <option value="toA">Name : Z to A </option>
+                <option value="toHigh">Price: Low to High</option>
+                <option value="toLow">Price: High to Low</option>
+                <option value="toZ">Name: A to Z</option>
+                <option value="toA">Name: Z to A</option>
               </Form.Select>
             </Form.Group>
-            <div>
-              <Link to="/admin/products/new">
-                <Button variant="dark">
-                  <MdOutlineAddBox /> Add New
-                </Button>
-              </Link>
-            </div>
+            <Link to="/admin/products/new" className="text-decoration-none">
+              <Button className="admin-product-button">
+                <IoAddCircleOutline aria-hidden /> Add New
+              </Button>
+            </Link>
           </Col>
         </Row>
       </Form>
 
-      <hr />
-      {/* Table */}
-
-      <Table hover responsive>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Product</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {displayProducts?.length > 0 ? (
-            displayProducts?.map((product, i) => (
-              <tr key={product._id}>
-                <td style={{ maxWidth: "50px" }} className="py-3">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    height={50}
-                    width={50}
-                    className="rounded d-block mx-auto"
-                  />
-                </td>
-                <td>
-                  <b>{product.name}</b> <br /> {product.status}
-                </td>
-                <td>
-                  {getCategoryNameById(product.category) || "Uncategorized"}
-                </td>
-                <td>$ {product.price}</td>
-                <td>{product.stock}</td>
-                <td className="text-white text-center ">
-                  {product?.stock === 0 ? (
-                    <div className="rounded bg-danger">Out of Stock</div>
-                  ) : product.stock < 30 ? (
-                    <div className="rounded bg-warning">Low in Stock</div>
-                  ) : (
-                    <div className="rounded bg-dark ">In Stock</div>
-                  )}
-                </td>
-                <td>
-                  <DropdownButton variant="light" title="">
-                    <Dropdown.Item as={Link} to={`edit/${product._id}`}>
-                      <FaEdit /> Edit
-                    </Dropdown.Item>
-                    <Dropdown.Item onClick={() => handleOnDelete(product._id)}>
-                      <MdDelete /> Delete
-                    </Dropdown.Item>
-                  </DropdownButton>
+      <div className="admin-products-table-wrap">
+        <Table hover responsive className="admin-products-table mb-0">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayProducts?.length > 0 ? (
+              displayProducts.map((product) => (
+                <tr key={product._id}>
+                  <td className="py-3">
+                    <img
+                      src={product.images?.[0]}
+                      alt={product.name}
+                      className="admin-product-thumb"
+                    />
+                  </td>
+                  <td>
+                    <b>{product.name}</b>
+                    <br />
+                    <span className="text-muted small">{product.status}</span>
+                  </td>
+                  <td>
+                    {getCategoryNameById(product.category) || "Uncategorized"}
+                  </td>
+                  <td>$ {Number(product.price || 0).toFixed(2)}</td>
+                  <td>{product.stock}</td>
+                  <td>
+                    {product?.stock === 0 ? (
+                      <span className="admin-stock-pill danger">
+                        Out of Stock
+                      </span>
+                    ) : product.stock < 30 ? (
+                      <span className="admin-stock-pill warning">Low Stock</span>
+                    ) : (
+                      <span className="admin-stock-pill success">In Stock</span>
+                    )}
+                  </td>
+                  <td>
+                    <div className="admin-product-actions">
+                      <Link to={`edit/${product._id}`} title="Edit product">
+                        <FaEdit aria-hidden />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleOnDelete(product)}
+                        title="Delete product"
+                      >
+                        <MdDelete aria-hidden />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" className="text-center py-4">
+                  <div>
+                    <strong>No products found</strong>
+                    <div className="text-muted small">
+                      Try adjusting your filters or search keywords.
+                    </div>
+                  </div>
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="7" className="text-center py-4">
-                <div>
-                  <strong>No products found</strong>
-                  <div className="text-muted small">
-                    Try adjusting your filters or search keywords.
-                  </div>
-                </div>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </Table>
+            )}
+          </tbody>
+        </Table>
+      </div>
 
-      {isFiltering ? (
-        ""
-      ) : (
+      {!isFiltering && (
         <div className="mt-2 d-flex justify-content-center w-100">
           <PaginationRounded
             totalPages={products.totalPages}
@@ -240,6 +245,19 @@ export const ProductTable = () => {
           />
         </div>
       )}
-    </>
+
+      <AppDialog
+        show={!!productToDelete}
+        variant="danger"
+        title="Delete product?"
+        message={`This will remove "${
+          productToDelete?.name || "this product"
+        }" from the catalog. This action cannot be undone.`}
+        cancelText="Keep Product"
+        confirmText="Delete Product"
+        onCancel={() => setProductToDelete(null)}
+        onConfirm={confirmProductDelete}
+      />
+    </div>
   );
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "react-bootstrap";
+import { IoAddOutline, IoCloseOutline } from "react-icons/io5";
 
 const AddedProductsSection = ({
   selectedProducts,
@@ -7,31 +8,40 @@ const AddedProductsSection = ({
   toggleProduct,
 }) => {
   return (
-    <div className="mb-4">
-      <Button variant="secondary" onClick={() => setShowProductModal(true)}>
-        Add Products ({selectedProducts?.length})
-      </Button>
-      <div
-        className="d-flex flex-wrap gap-2 mt-2 border p-2"
-        style={{ minHeight: "100px" }}
-      >
+    <div className="admin-form-selected-products">
+      <div className="admin-form-selected-top">
+        <div>
+          <strong>Linked Products</strong>
+          <span>{selectedProducts?.length || 0} selected</span>
+        </div>
+        <Button
+          type="button"
+          className="admin-form-secondary compact"
+          onClick={() => setShowProductModal(true)}
+        >
+          <IoAddOutline />
+          Add Products
+        </Button>
+      </div>
+      <div className="admin-form-product-chip-list">
+        {(selectedProducts?.length || 0) <= 0 && (
+          <span className="admin-form-empty-chip">No products linked yet</span>
+        )}
         {selectedProducts?.map((product) => (
-          <span
+          <button
+            type="button"
             key={product._id}
-            className="badge bg-dark d-flex align-items-center"
-            style={{ maxHeight: "25px" }}
+            className="admin-form-product-chip"
+            onClick={() => toggleProduct(product)}
+            title="Remove product"
           >
-            {product.name.length > 30
-              ? product.name.slice(0, 30) + "..."
-              : product.name}
-            &nbsp;
-            <span
-              style={{ cursor: "pointer", fontSize: "15px" }}
-              onClick={() => toggleProduct(product)}
-            >
-              &times;
+            <span>
+              {product.name.length > 30
+                ? product.name.slice(0, 30) + "..."
+                : product.name}
             </span>
-          </span>
+            <IoCloseOutline />
+          </button>
         ))}
       </div>
     </div>

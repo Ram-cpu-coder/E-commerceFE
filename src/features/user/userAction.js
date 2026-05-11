@@ -64,7 +64,6 @@ export const registerUserAction = (registerObj) => async (dispatch) => {
 export const verifyUserAction = ({ sessionId, token }) =>
   async () => {
     const pending = verifyUserApi({ sessionId, token });
-    console.log(sessionId, token)
     toast.promise(pending, {
       pending: "Verifying...",
     });
@@ -73,7 +72,7 @@ export const verifyUserAction = ({ sessionId, token }) =>
   };
 
 // verify email action
-export const verifyEmailAndSendOTPAction = (email) => async (dispatch) => {
+export const verifyEmailAndSendOTPAction = (email) => async () => {
   const pending = verifyEmailAndSendOTPApi(email);
 
   toast.promise(pending, {
@@ -87,7 +86,7 @@ export const verifyEmailAndSendOTPAction = (email) => async (dispatch) => {
 };
 
 export const verifyOTP = ({ email, Otp }) =>
-  async (dispatch) => {
+  async () => {
     const pending = verifyOTPApi({ email, Otp });
     toast.promise(pending, { pending: "Verifying OTP..." });
     const { message, status } = await pending;
@@ -142,8 +141,7 @@ export const fetchUserAction = () => async (dispatch) => {
 
     foundUser && dispatch(setUser(foundUser));
   } catch (error) {
-    console.log(error);
-    if (error.messgae === "jwt expired") {
+    if (error.message === "jwt expired") {
       sessionStorage.removeItem("accessJWT");
       localStorage.removeItem("refreshJWT");
     }
@@ -153,7 +151,7 @@ export const fetchUserAction = () => async (dispatch) => {
 
 export const getAdminUsersPresentWeekTimeFrameAction = (startTime, endTime) => async (dispatch) => {
 
-  const { status, message, users } = await getAllUsersTimeFrame(startTime, endTime);
+  const { status, users } = await getAllUsersTimeFrame(startTime, endTime);
 
   await dispatch(setTimeFramePresentWeekUsers(users))
   if (status === "success") {
@@ -163,7 +161,7 @@ export const getAdminUsersPresentWeekTimeFrameAction = (startTime, endTime) => a
 
 export const getAdminUsersPastWeekTimeFrameAction = (startTime, endTime) => async (dispatch) => {
 
-  const { status, message, users } = await getAllUsersTimeFrame(startTime, endTime);
+  const { status, users } = await getAllUsersTimeFrame(startTime, endTime);
 
   await dispatch(setTimeFramePastWeekUsers(users))
   if (status === "success") {
@@ -192,7 +190,7 @@ export const autoLogin = () => async (dispatch) => {
         await dispatch(fetchUserAction());
       }
     }
-  } catch (error) {
+  } catch {
     //remove tokens in case if autologin fail
     sessionStorage.removeItem("accessJWT");
     localStorage.removeItem("refreshJWT");
@@ -215,8 +213,7 @@ export const logoutAction = () => async (dispatch) => {
       toast[status](message)
       return true;
     }
-  } catch (error) {
-    console.log(error?.message, 5555)
+  } catch {
     return false
   }
 
@@ -242,12 +239,12 @@ export const updateUserAction = (obj) => async (dispatch) => {
 }
 
 // resending the verification link 
-export const resendVerificationLinkAction = (email) => async (dispatch) => {
+export const resendVerificationLinkAction = (email) => async () => {
   const pending = resendVerificationLinkApi(email)
   toast.promise(pending, {
     pending: "Sending..."
   })
-  const { status, message, user } = await pending
+  const { status, message } = await pending
   toast[status](message)
   if (status === "success") {
     return true

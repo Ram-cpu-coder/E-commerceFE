@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { deleteOrderItemAction } from "../../features/orders/orderActions";
 import { useDispatch } from "react-redux";
@@ -10,7 +10,6 @@ const ActionsForItems = ({
   product,
   handleToggleReview,
   isReviewing,
-  setIsReviewing,
 }) => {
   const dispatch = useDispatch();
 
@@ -24,7 +23,6 @@ const ActionsForItems = ({
       {user.role === "customer" && (
         <Review
           productId={product._id}
-          setIsReviewing={setIsReviewing}
           handleToggleReview={handleToggleReview}
           isReviewing={isReviewing}
         />

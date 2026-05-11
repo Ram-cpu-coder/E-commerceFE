@@ -5,31 +5,35 @@ import {
 } from "../../assets/form-data/ShippingAddressInput";
 import { Button, Form } from "react-bootstrap";
 
-const ShippingAddressForm = ({ form, handleOnChange }) => {
+const ShippingAddressForm = ({
+  form,
+  handleOnChange,
+  submitLabel = "Continue to payment",
+}) => {
   return (
     <>
       {addressInput.map((item, index) => (
-        <Form.Group className="mb-3" controlId={item.name} key={index}>
+        <Form.Group className="checkout-form-field" controlId={item.name} key={index}>
           <Form.Label>{item.label}</Form.Label>
           <Form.Control
             type={item.type}
             name={item.name}
-            value={form[item.name]}
+            value={form[item.name] || ""}
             onChange={handleOnChange}
             placeholder={item.placeholder}
             required={item.required}
           />
         </Form.Group>
       ))}
-      <Form.Group className="mb-3" controlId="country">
+      <Form.Group className="checkout-form-field" controlId="country">
         <Form.Label>Country</Form.Label>
         <Form.Select
           name="country"
-          value={form.country}
+          value={form.country || ""}
           onChange={handleOnChange}
           required
         >
-          <option value="">Select Country</option>
+          <option value="">Select delivery country</option>
           {countryList.map((country, index) => (
             <option key={index} value={country}>
               {country}
@@ -38,8 +42,8 @@ const ShippingAddressForm = ({ form, handleOnChange }) => {
         </Form.Select>
       </Form.Group>
 
-      <Button variant="primary" type="submit" className="col-12">
-        Update Address
+      <Button type="submit" className="checkout-primary-button">
+        {submitLabel}
       </Button>
     </>
   );

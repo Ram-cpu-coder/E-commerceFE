@@ -21,7 +21,7 @@ const ViewProductsListed = () => {
     (state) => state.categoryInfo
   );
 
-  const { form, handleOnChange, setForm } = useForm({
+  const { form, handleOnChange } = useForm({
     searchQuery: "",
     category: selectedCategory?._id || "all",
     others: "newest",
@@ -46,16 +46,16 @@ const ViewProductsListed = () => {
 
   useEffect(() => {
     dispatch(setMenu("Banners"));
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(fetchFeatureBannerAction());
     dispatch(getActiveProductAction());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     setDisplayProducts(filterFunction(form, listedProducts || []));
-  }, [form]);
+  }, [form, listedProducts]);
 
   useEffect(() => {
     const isActive =

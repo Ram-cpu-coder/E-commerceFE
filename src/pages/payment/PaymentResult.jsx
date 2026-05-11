@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { verifyPaymentSession } from "../../features/payment/PaymentAxios";
 import {
   makePaymentAction,
   verifyPaymentAction,
@@ -8,7 +7,12 @@ import {
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteCartAction } from "../../features/cart/cartAction";
-import PlaceOrder from "./PlaceOrder";
+import OrderConfirmationPage from "../../components/ordersComponent/OrderConfirmationPage";
+import {
+  IoCloseCircleOutline,
+  IoHomeOutline,
+  IoRefreshOutline,
+} from "react-icons/io5";
 
 const PaymentResult = () => {
   const [searchParams] = useSearchParams();
@@ -28,11 +32,8 @@ const PaymentResult = () => {
 
   const handleCheckoutAction = async () => {
     try {
-      const data = await makePaymentAction();
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
+      await dispatch(makePaymentAction());
+    } catch {
       toast.error("Something went wrong during checkout");
     }
   };
@@ -43,22 +44,20 @@ const PaymentResult = () => {
         setIsVerified(false);
         return;
       }
-      if (!user || !user._id || !user.address) {
-        return <p className="text-center mt-20">Loading user info...</p>;
-      }
 
+      if (!user?._id || !user?.address) return;
       if (hasVerified.current) return;
       hasVerified.current = true;
 
-      const data = await verifyPaymentAction(sessionId, {
-        shippingAddress: user?.address,
-        userId: user?._id,
-      });
-      console.log(data);
+      const data = await dispatch(verifyPaymentAction({
+        shippingAddress: user.address,
+        userId: user._id,
+        sessionId,
+      }));
+
       if (!data) {
         setIsVerified(false);
         setStatus("error");
-        console.log("error from the payment verification ");
         return;
       }
 
@@ -66,67 +65,43 @@ const PaymentResult = () => {
       setIsVerified(data?.verified);
       setStatus(data?.status || "success");
       if (data?.verified) {
-        dispatch(deleteCartAction(cart._id));
+        dispatch(deleteCartAction(cart?._id));
       }
     };
-    user && verify();
-  }, [user, sessionId, dispatch, cart._id]);
 
-  if (isVerified === null)
+    verify();
+  }, [user, sessionId, dispatch, cart?._id]);
+
+  if (isVerified === null) {
     return (
-      <p className="text-center mt-5" style={{ minHeight: "60vh" }}>
-        Verifying payment...
-      </p>
-    );
-
-  if (isVerified && isSuccessParam === "true") {
-    return (
-      <div
-        className="text-center d-flex flex-column justify-content-center align-items-center"
-        style={{ height: "55vh", margin: "auto" }}
-      >
-        <h2 className="text-3xl text-green-600">
-          🎉 Thank you for your purchase!
-        </h2>
-        <p className="mt-4 text-gray-600">Your payment was successful.</p>
-
-        {/* placed order detail */}
-
-        <PlaceOrder item={placedOrder} />
-
-        <button
-          className="mt-6 px-4 py-2 bg-black text-white rounded col-5 col-sm-2"
-          onClick={() => navigate("/")}
-        >
-          Back to Home
-        </button>
+      <div className="payment-result-loading">
+        <span className="payment-result-spinner" />
+        <p>Verifying payment...</p>
       </div>
     );
   }
+
+  if (isVerified && isSuccessParam === "true") {
+    return <OrderConfirmationPage order={placedOrder} />;
+  }
+
   return (
-    <div
-      className="text-center mt-20 d-flex flex-column justify-content-center align-items-center"
-      style={{ height: "51vh" }}
-    >
-      <h2 className="text-3xl text-red-600">❌ Payment Failed or Canceled</h2>
-      <p className="mt-4 text-gray-600">
-        Payment status: {status || "unknown"}
-      </p>
-      <button
-        className="m-3 px-4 py-2 bg-black text-white rounded"
-        onClick={() => navigate("/")}
-        style={{ width: "140px" }}
-      >
-        Back to Home
-      </button>
-      <button
-        className="mt-6 px-4 py-2 bg-black text-white rounded"
-        onClick={handleCheckoutAction}
-        style={{ width: "140px" }}
-      >
-        Try Again
-      </button>
-    </div>
+    <section className="payment-result-failed">
+      <span>
+        <IoCloseCircleOutline aria-hidden />
+      </span>
+      <p className="section-kicker">Payment issue</p>
+      <h1>Payment failed or was canceled</h1>
+      <p>Payment status: {status || "unknown"}</p>
+      <div className="payment-result-actions">
+        <button onClick={() => navigate("/")}>
+          <IoHomeOutline aria-hidden /> Back to home
+        </button>
+        <button onClick={handleCheckoutAction}>
+          <IoRefreshOutline aria-hidden /> Try again
+        </button>
+      </div>
+    </section>
   );
 };
 

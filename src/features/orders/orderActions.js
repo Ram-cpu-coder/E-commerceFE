@@ -1,7 +1,6 @@
 import { toast } from "react-toastify";
 import { deleteOrderApi, deleteOrderItemApi, getAdminSalesTimeFrameApi, getAllOrders, getAllOrdersNoPagination, getAllOrdersTimeFrame, getOrder, updateOrder } from "./orderAxios"
 import { setOrders, setOrdersNoPagination, setSales, setTimeFramePastWeekOrders, setTimeFramePresentWeekOrders } from "./orderSlice";
-import { createRecentActivity } from "../recentActivity/recentActivityAPI";
 import { createRecentActivityWithAuthenticationAction } from "../recentActivity/recentActivityAction";
 
 
@@ -9,14 +8,14 @@ export const getOrderAction = () => async (dispatch, getState) => {
     const page = getState().orderInfo.orderCustomerPage
     const pending = getOrder(page);
 
-    const { status, message, orders } = await pending;
+    const { status, orders } = await pending;
     if (status === "success") { dispatch(setOrders(orders)) };
 }
 
 export const getAdminOrderAction = () => async (dispatch, getState) => {
     const page = getState().orderInfo.orderAdminPage
     const pending = getAllOrders(page);
-    const { status, message, orders } = await pending;
+    const { status, orders } = await pending;
 
     await dispatch(setOrders(orders))
     if (status === "success") {
@@ -24,10 +23,10 @@ export const getAdminOrderAction = () => async (dispatch, getState) => {
     }
 }
 
-export const getAllOrderNoPaginationAction = () => async (dispatch, getState) => {
+export const getAllOrderNoPaginationAction = () => async (dispatch) => {
 
     const pending = getAllOrdersNoPagination();
-    const { status, message, orders } = await pending;
+    const { status, orders } = await pending;
 
     await dispatch(setOrdersNoPagination(orders))
     if (status === "success") {
@@ -37,7 +36,7 @@ export const getAllOrderNoPaginationAction = () => async (dispatch, getState) =>
 
 export const getAdminSalesTimeFrameAction = (startTime, endTime, granularity) => async (dispatch) => {
 
-    const { status, message, sales } = await getAdminSalesTimeFrameApi(startTime, endTime, granularity);
+    const { status, sales } = await getAdminSalesTimeFrameApi(startTime, endTime, granularity);
     if (status === "success") {
         dispatch(setSales(sales))
         return true
@@ -46,7 +45,7 @@ export const getAdminSalesTimeFrameAction = (startTime, endTime, granularity) =>
 
 export const getAdminOrdersPresentWeekTimeFrameAction = (startTime, endTime) => async (dispatch) => {
 
-    const { status, message, orders } = await getAllOrdersTimeFrame(startTime, endTime);
+    const { status, orders } = await getAllOrdersTimeFrame(startTime, endTime);
 
     await dispatch(setTimeFramePresentWeekOrders(orders))
     if (status === "success") {
@@ -56,7 +55,7 @@ export const getAdminOrdersPresentWeekTimeFrameAction = (startTime, endTime) => 
 
 export const getAdminOrdersPastWeekTimeFrameAction = (startTime, endTime) => async (dispatch) => {
 
-    const { status, message, orders } = await getAllOrdersTimeFrame(startTime, endTime);
+    const { status, orders } = await getAllOrdersTimeFrame(startTime, endTime);
 
     await dispatch(setTimeFramePastWeekOrders(orders))
     if (status === "success") {
@@ -64,15 +63,15 @@ export const getAdminOrdersPastWeekTimeFrameAction = (startTime, endTime) => asy
     }
 }
 
-export const updateOrderAction = (updateObj) => async (dispatch) => {
+export const updateOrderAction = (updateObj) => async (dispatch, getState) => {
     const pending = updateOrder(updateObj);
     toast.promise(pending, {
         pending: "Updating..."
     })
     const { status, message, orderUpdated } = await pending;
-    console.log(orderUpdated)
     if (status === "success") {
-        dispatch(getAdminOrderAction());
+        const role = getState()?.userInfo?.user?.role;
+        role === "admin" ? dispatch(getAdminOrderAction()) : dispatch(getOrderAction());
 
         const obj = {
             action: "orderUpdated",

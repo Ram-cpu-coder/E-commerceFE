@@ -7,7 +7,6 @@ import {
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  handleStockAction,
   verifyPaymentAction,
 } from "../../features/payment/PaymentActions";
 import { updateOrderAction } from "../../features/orders/orderActions";
@@ -16,9 +15,9 @@ import { createUserHistoryAction } from "../../features/userHistory/userHistoryA
 import Spinner from "react-bootstrap/Spinner";
 import { toast } from "react-toastify";
 import {
-  createRecentActivityAction,
   createRecentActivityWithAuthenticationAction,
 } from "../../features/recentActivity/recentActivityAction";
+import AppDialog from "../../components/dialogs/AppDialog";
 
 const CheckOutForm = ({
   setConfirmation,
@@ -31,6 +30,7 @@ const CheckOutForm = ({
   const { cart } = useSelector((state) => state.cartInfo);
 
   const [processing, setProcessing] = useState(false);
+  const [dialog, setDialog] = useState(null);
 
   const stripe = useStripe();
   const elements = useElements();
@@ -43,13 +43,6 @@ const CheckOutForm = ({
         return;
       }
 
-      const hasEnoughStock = await dispatch(handleStockAction());
-
-      if (!hasEnoughStock) {
-        toast.error("Not Enough Stock!");
-        return;
-      }
-
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -59,7 +52,10 @@ const CheckOutForm = ({
       });
 
       if (error) {
-        alert(error?.message);
+        setDialog({
+          title: "Payment could not be completed",
+          message: error?.message || "Please check your payment details and try again.",
+        });
         return;
       }
 
@@ -71,8 +67,9 @@ const CheckOutForm = ({
       const response = await dispatch(
         verifyPaymentAction({
           shippingAddress:
-            !shippingAddress === undefined ? shippingAddress : user.address,
+            shippingAddress || user.address,
           userId: user._id,
+          paymentIntent,
         })
       );
 
@@ -119,26 +116,38 @@ const CheckOutForm = ({
     }
   };
   return (
-    <div style={{ minHeight: "80vh" }}>
-      <form onSubmit={handleSubmit}>
-        <PaymentElement />
-        <div className="d-flex justify-content-center mt-3">
-          <Button disabled={!stripe || processing} type="submit">
-            {processing ? (
-              <div className=" d-flex align-items-center gap-2">
-                <Spinner
-                  className="border-1"
-                  style={{ width: "1rem", height: "1rem" }}
-                />
-                Processing
-              </div>
-            ) : (
-              "Place Order"
-            )}
-          </Button>
-        </div>
-      </form>
-    </div>
+    <>
+      <div className="checkout-stripe-box">
+        <form onSubmit={handleSubmit} className="checkout-stripe-form">
+          <PaymentElement />
+          <div className="checkout-payment-actions">
+            <Button disabled={!stripe || processing} type="submit" className="checkout-primary-button">
+              {processing ? (
+                <div className="d-flex align-items-center gap-2">
+                  <Spinner
+                    className="border-1"
+                    style={{ width: "1rem", height: "1rem" }}
+                  />
+                  Processing
+                </div>
+              ) : (
+                "Place Order"
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
+
+      <AppDialog
+        show={!!dialog}
+        variant="error"
+        title={dialog?.title}
+        message={dialog?.message}
+        confirmOnly
+        confirmText="Got It"
+        onConfirm={() => setDialog(null)}
+      />
+    </>
   );
 };
 

@@ -11,24 +11,56 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import OrderConfirmationPage from "./ordersComponent/OrderConfirmationPage";
+import { IoCardOutline, IoLocationOutline, IoShieldCheckmarkOutline } from "react-icons/io5";
+import AppDialog from "./dialogs/AppDialog";
 
 const ShippingAddress = () => {
   const dispatch = useDispatch();
-  const { handleOnChange, form } = useForm({});
 
   const { user } = useSelector((state) => state.userInfo);
+  const { cart } = useSelector((state) => state.cartInfo);
+  const { handleOnChange, form } = useForm({
+    unit: "",
+    street: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "",
+  });
 
   const [addressConfirmed, setAddressConfirmed] = useState(false);
   const [confirmation, setConfirmation] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [dialog, setDialog] = useState(null);
 
   const steps = ["Shipping Address", "Payment", "Confirmation"];
 
-  console.log("confirmation State: ", confirmation);
+  const buildAddressFromForm = () => {
+    const parts = [
+      form.unit ? `Unit ${form.unit}` : "",
+      form.street,
+      form.city,
+      form.state,
+      form.postalCode,
+      form.country,
+    ].filter(Boolean);
+
+    return parts.join(", ");
+  };
 
   // checkout
   const handleCheckoutAction = async (mode) => {
-    const fullAddress = `Unit ${form.unit}/${form.street}, ${form.city}, ${form.state}, ${form.postalCode}, ${form.country}`;
+    const fullAddress =
+      mode === "existing" ? user?.address : buildAddressFromForm();
+
+    if (!fullAddress) {
+      setDialog({
+        title: "Shipping address needed",
+        message: "Please choose your saved address or enter a new shipping address.",
+      });
+      return;
+    }
+
     localStorage.setItem("shippingAddressNew", fullAddress);
 
     if (mode === "update") {
@@ -40,16 +72,17 @@ const ShippingAddress = () => {
     }
 
     if (mode === "existing") {
-      dispatch(setShippingAddress(fullAddress));
+      await dispatch(setShippingAddress(fullAddress));
     }
 
     try {
       setAddressConfirmed(true);
       setActiveStep(1);
-    } catch (error) {
-      alert(
-        "Something has gone wrong while setting the address, Try Again Please!"
-      );
+    } catch {
+      setDialog({
+        title: "Address could not be set",
+        message: "Something went wrong while setting the address. Please try again.",
+      });
     }
   };
 
@@ -75,27 +108,52 @@ const ShippingAddress = () => {
   //   }
   // };
   return (
-    <div className="container d-flex flex-column align-items-center my-5">
-      {/* stepper to show the stages of the order placement */}
-      <Stepper activeStep={activeStep} alternativeLabel className="col-10 my-5">
-        {steps.map((item, index) => (
-          <Step key={item} completed={index < activeStep}>
-            <StepLabel
-            // style={{ cursor: index <= activeStep ? "pointer" : "default" }}
-            // onClick={() => handleStepClick(index)}
-            >
-              {item}
-            </StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+    <div className="checkout-page">
+      {!confirmation && (
+        <>
+          <section className="checkout-hero">
+            <div>
+              <p className="section-kicker">Secure checkout</p>
+              <h1>Complete your order</h1>
+              <p>
+                Confirm delivery, review stock-backed cart items, and finish payment
+                through a protected Stripe checkout flow.
+              </p>
+            </div>
+            <div className="checkout-hero-badges">
+              <span><IoShieldCheckmarkOutline aria-hidden /> Stock checked</span>
+              <span><IoCardOutline aria-hidden /> Secure payment</span>
+            </div>
+          </section>
+
+          {/* stepper to show the stages of the order placement */}
+          <Stepper activeStep={activeStep} alternativeLabel className="checkout-stepper">
+            {steps.map((item, index) => (
+              <Step key={item} completed={index < activeStep}>
+                <StepLabel
+                // style={{ cursor: index <= activeStep ? "pointer" : "default" }}
+                // onClick={() => handleStepClick(index)}
+                >
+                  {item}
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </>
+      )}
 
       {!addressConfirmed && !confirmation && (
-        <div className="row col-12 col-md-8 col-lg-7">
-          <h5 className="py-2">Shipping Address</h5>
-          <div className="d-flex align-items-start gap-4">
+        <div className="checkout-address-grid">
+          <section className="checkout-panel checkout-address-panel">
+            <div className="checkout-panel-heading">
+              <span><IoLocationOutline aria-hidden /></span>
+              <div>
+                <p className="section-kicker">Delivery address</p>
+                <h2>Where should we send it?</h2>
+              </div>
+            </div>
             <Form
-              className="w-75 shadow p-3 rounded"
+              className="checkout-address-form"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleCheckoutAction("update");
@@ -104,26 +162,38 @@ const ShippingAddress = () => {
               <ShippingAddressForm
                 form={form}
                 handleOnChange={handleOnChange}
+                submitLabel="Continue to payment"
               />
             </Form>
+          </section>
 
-            {/* if user wants to go with existing address */}
+          <aside className="checkout-side-panel">
+            <div className="checkout-mini-summary">
+              <p className="section-kicker">Order snapshot</p>
+              <h3>{cart?.length || 0} item{cart?.length === 1 ? "" : "s"} in cart</h3>
+              <p>
+                Stock availability is checked before payment and again before
+                order creation.
+              </p>
+            </div>
             {user.address ? (
-              <>
-                <div className="d-flex flex-column justify-content-between align-items-center w-25">
-                  <p className="mb-0 border px-3 rounded">{user.address}</p>
-                  <button
-                    className="btn btn-link"
-                    onClick={() => handleCheckoutAction("existing")}
-                  >
-                    Existing address
-                  </button>
-                </div>
-              </>
+              <div className="checkout-existing-address">
+                <span><IoLocationOutline aria-hidden /> Saved address</span>
+                <p>{user.address}</p>
+                <button
+                  type="button"
+                  onClick={() => handleCheckoutAction("existing")}
+                >
+                  Use saved address
+                </button>
+              </div>
             ) : (
-              ""
+              <div className="checkout-existing-address muted">
+                <span><IoLocationOutline aria-hidden /> Saved address</span>
+                <p>No saved address yet. Add one now and it can be reused later.</p>
+              </div>
             )}
-          </div>
+          </aside>
         </div>
       )}
 
@@ -138,6 +208,16 @@ const ShippingAddress = () => {
 
       {/* {confirmation page} */}
       {confirmation && !addressConfirmed && <OrderConfirmationPage />}
+
+      <AppDialog
+        show={!!dialog}
+        variant="warning"
+        title={dialog?.title}
+        message={dialog?.message}
+        confirmOnly
+        confirmText="Got It"
+        onConfirm={() => setDialog(null)}
+      />
     </div>
   );
 };

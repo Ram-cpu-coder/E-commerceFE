@@ -13,8 +13,7 @@ export const createCartAction = (_id, quantity) => async (dispatch) => {
   toast.promise(pending, {
     pending: "Adding item...",
   });
-  const { response, status, message } = await pending;
-  console.log(status, message);
+  const { status, message } = await pending;
   toast[status](message);
   dispatch(fetchCartAction())
 };
@@ -37,11 +36,16 @@ export const deleteCartItemAction = (_id) => async (dispatch) => {
 };
 
 export const updateCartItemAction = ({ quantity, _id, totalPrice }) => async (dispatch) => {
-  const { status, message, response } = await updateCartItemAxios({
+  const { status, message } = await updateCartItemAxios({
     quantity,
     _id,
     totalPrice,
   });
+  if (status === "success") {
+    dispatch(fetchCartAction());
+  } else if (message) {
+    toast[status](message);
+  }
 };
 
 export const deleteCartAction = () => async (dispatch) => {
@@ -49,6 +53,6 @@ export const deleteCartAction = () => async (dispatch) => {
   toast.promise(pending, {
     pending: "Processing..."
   })
-  const { status, message } = await pending;
+  const { status } = await pending;
   if (status === "success") { dispatch(resetCart()) }
 }

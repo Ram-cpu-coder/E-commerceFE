@@ -4,11 +4,6 @@ import MyChart from "../../Charts/MyChart";
 import { Modal } from "react-bootstrap";
 
 const SmartDashboard = ({ smartDashboard, setSmartDashboard }) => {
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
   const chatBoxRef = useRef(null);
 
   const [messages, setMessages] = useState(() => {

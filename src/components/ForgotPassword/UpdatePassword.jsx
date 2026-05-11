@@ -23,32 +23,29 @@ const UpdatePassword = ({ handleOnChange, form, isPassword, from }) => {
   };
   return (
     isPassword && (
-      <div className="d-flex flex-column gap-3 mb-2">
-        <div className="d-flex gap-1">
+      <div className="forgot-password-update">
+        <div className="forgot-password-grid">
           <Form.Control
             required
             value={form.password}
             name="password"
             type="password"
-            placeholder="Password"
+            placeholder="Enter new password"
             onChange={handleOnChange}
-            style={{ height: "2.5rem" }}
           />
           <Form.Control
             required
             value={form.confirmPassword}
             name="confirmPassword"
             type="password"
-            placeholder="Confirm Password"
+            placeholder="Confirm new password"
             onChange={handleOnChange}
-            style={{ height: "2.5rem" }}
           />
         </div>
-        <div className="d-flex justify-content-center">
+        <div className="forgot-password-actions">
           <Button
             variant="primary"
             onClick={handleOnUpdatePw}
-            style={{ height: "2.5rem" }}
           >
             Update Password
           </Button>
