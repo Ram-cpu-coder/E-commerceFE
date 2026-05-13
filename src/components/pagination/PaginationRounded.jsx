@@ -16,6 +16,10 @@ import {
 
 export default function PaginationRounded({ totalPages, page, mode, client }) {
   const dispatch = useDispatch();
+  const pages = Number(totalPages || 0);
+
+  if (pages <= 1) return null;
+
   const handleOnChange = (event, value) => {
     const key = `${mode}_${client}`;
 
@@ -43,7 +47,7 @@ export default function PaginationRounded({ totalPages, page, mode, client }) {
   return (
     <Stack spacing={2} className="mt-3 d-flex align-items-end">
       <Pagination
-        count={totalPages}
+        count={pages}
         page={page}
         variant="outlined"
         shape="rounded"

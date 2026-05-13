@@ -12,9 +12,11 @@ import {
 } from "../../features/user/userAction";
 import { useDispatch, useSelector } from "react-redux";
 import numeral from "numeral";
+import { useNavigate } from "react-router-dom";
 
 const NewCustomers = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [comparedData, setComparedData] = useState(null);
 
   const { timeFramePastWeekUsers, timeFramePresentWeekUsers } = useSelector(
@@ -80,7 +82,12 @@ const NewCustomers = () => {
   }, [pastUsersAmount, presentUsersAmount]);
 
   return (
-    <Col xs={12} sm={6}>
+    <Col
+      xs={12}
+      sm={6}
+      onClick={() => navigate("/admin/customers?range=this-week")}
+      style={{ cursor: "pointer" }}
+    >
       <div className="dashboard-stat-card h-100">
         <div className="d-flex flex-row align-items-center">
           <div className="d-flex flex-row align-items-center gap-2 me-auto">

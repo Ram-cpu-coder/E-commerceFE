@@ -11,8 +11,6 @@ import {
   getWishlistAction,
 } from "../../features/wishlist/wishlistAction";
 import { getPubReviewAction } from "../../features/reviews/reviewAction";
-import CircularProgress from "@mui/material/CircularProgress";
-import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 
@@ -42,6 +40,7 @@ const ProductLandingPage = () => {
   const [showReviews, setShowReviews] = useState(false);
 
   const favourite = wishlist?.some((item) => item.productId === id);
+  const hasCurrentProduct = selectedProduct?._id === id;
 
   useEffect(() => {
     if (!selectedProduct?.name || selectedProduct._id !== id) return;
@@ -60,14 +59,14 @@ const ProductLandingPage = () => {
       setLoading(true);
 
       // 1. Fetch product if not already loaded or different product
-      if (!selectedProduct || selectedProduct._id !== id) {
+      if (!hasCurrentProduct) {
         await dispatch(getSingleProductAction(id));
       }
 
       await dispatch(getPubReviewAction(id));
 
       // 3. Fetch wishlist only if user exists and wishlist is empty
-      if (user?._id && wishlist.length === 0) {
+      if (user?._id && (wishlist?.length || 0) === 0) {
         await dispatch(getWishlistAction());
       }
 
@@ -82,9 +81,9 @@ const ProductLandingPage = () => {
   }, [
     dispatch,
     id,
-    selectedProduct,
+    hasCurrentProduct,
     user?._id,
-    wishlist.length,
+    wishlist?.length,
   ]);
 
   // --- Lazy-load reviews after a short delay ---
@@ -146,12 +145,17 @@ const ProductLandingPage = () => {
 
   if (loading) {
     return (
-      <Backdrop
-        sx={(theme) => ({ color: "white", zIndex: theme.zIndex.drawer + 1 })}
-        open
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
+      <div className="product-page-shell">
+        <div className="product-page-container product-detail-shell product-detail-grid">
+          <Skeleton variant="rounded" height={420} />
+          <Box sx={{ display: "grid", gap: 2 }}>
+            <Skeleton variant="text" width="70%" height={48} />
+            <Skeleton variant="text" width="45%" height={34} />
+            <Skeleton variant="rounded" height={74} />
+            <Skeleton variant="rounded" height={54} />
+          </Box>
+        </div>
+      </div>
     );
   }
 
@@ -161,6 +165,11 @@ const ProductLandingPage = () => {
         <div>
           <p className="section-kicker">Product detail</p>
           <h1>{selectedProduct.name}</h1>
+          {selectedProduct.shopName && (
+            <span className="product-shop-detail-tag">
+              Sold by {selectedProduct.shopName}
+            </span>
+          )}
           <p>
             Explore the gallery, reviews, pricing, and stock details before
             adding this item to your cart.

@@ -10,7 +10,7 @@ const ProductCard = ({ item }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { _id, name, price, images, reviews, category } = item;
+  const { _id, name, price, images, reviews, category, shopName } = item;
 
   const { user } = useSelector((state) => state.userInfo);
   const { allPubReviews } = useSelector((state) => state.reviewInfo);
@@ -69,6 +69,11 @@ const ProductCard = ({ item }) => {
         {selectedCategory && (
           <span className="product-card-badge">
             {selectedCategory.categoryName}
+          </span>
+        )}
+        {shopName && (
+          <span className="product-card-shop-tag">
+            {shopName}
           </span>
         )}
         <Card.Img

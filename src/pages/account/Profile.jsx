@@ -2,17 +2,30 @@ import { lazy, useEffect, useState } from "react";
 
 import { Button, Container, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UserLayout } from "../../components/layouts/UserLayout";
 import { setMenu } from "../../features/user/userSlice";
 import {
   fetchUserAction,
+  requestAdminAccessAction,
   resendVerificationLinkAction,
   updatePwAction,
+  updateUserAction,
   verifyEmailAndSendOTPAction,
   verifyOTP,
 } from "../../features/user/userAction";
-import { IoLockClosedOutline, IoMailOutline, IoPersonOutline, IoShieldCheckmarkOutline } from "react-icons/io5";
+import {
+  IoBagCheckOutline,
+  IoCartOutline,
+  IoGridOutline,
+  IoImageOutline,
+  IoLockClosedOutline,
+  IoMailOutline,
+  IoPersonOutline,
+  IoPricetagOutline,
+  IoShieldCheckmarkOutline,
+  IoSparklesOutline,
+} from "react-icons/io5";
 
 const LoginSecurityCard = lazy(() => import("./LoginSecurityCard"));
 const BreadCrumbsAdmin = lazy(() =>
@@ -36,6 +49,9 @@ const Profile = () => {
   const [otpVerified, setOtpVerified] = useState(false);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [resendLocked, setResendLocked] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState("");
+  const [adminRequestMessage, setAdminRequestMessage] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,6 +92,45 @@ const Profile = () => {
   useEffect(() => {
     dispatch(setMenu("Settings"));
   }, []);
+
+  useEffect(() => {
+    setProfileImagePreview(user.image || "");
+  }, [user.image]);
+
+  const quickLinks =
+    user.role === "admin" || user.role === "superadmin"
+      ? [
+          { label: "Dashboard", to: "/admin/adminDashboard", icon: <IoGridOutline /> },
+          { label: "Products", to: "/admin/products", icon: <IoPricetagOutline /> },
+          { label: "Orders", to: "/admin/orders", icon: <IoBagCheckOutline /> },
+          ...(user.role === "superadmin"
+            ? [{ label: "Super Admin", to: "/admin/superadmin", icon: <IoShieldCheckmarkOutline /> }]
+            : []),
+        ]
+      : [
+          { label: "Orders", to: "/user/orders", icon: <IoBagCheckOutline /> },
+          { label: "Cart", to: "/user/cart", icon: <IoCartOutline /> },
+          { label: "Wishlist", to: "/user/wishlist", icon: <IoSparklesOutline /> },
+        ];
+
+  const handleProfileImageUpdate = async (e) => {
+    e.preventDefault();
+    if (!profileImageFile) return;
+    const formData = new FormData();
+    formData.append("image", profileImageFile);
+    const updated = await dispatch(updateUserAction(formData));
+    if (updated) {
+      setProfileImageFile(null);
+    }
+  };
+
+  const handleAdminAccessRequest = async (e) => {
+    e.preventDefault();
+    const sent = await dispatch(requestAdminAccessAction(adminRequestMessage));
+    if (sent) {
+      setAdminRequestMessage("");
+    }
+  };
 
   const handleSecurityChange = (e) => {
     const { name, value } = e.target;
@@ -214,7 +269,11 @@ const Profile = () => {
         <div className="profile-settings-page">
           <section className="profile-settings-hero">
             <div className="profile-settings-avatar">
-              <IoPersonOutline aria-hidden />
+              {user.image ? (
+                <img src={user.image} alt={user.fName || "Profile"} />
+              ) : (
+                <IoPersonOutline aria-hidden />
+              )}
             </div>
             <div>
               <p className="section-kicker">{user.role || "customer"} account</p>
@@ -237,7 +296,89 @@ const Profile = () => {
                   <LoginSecurityCard item={item} key={index} />
                 ))}
               </div>
+              <form className="profile-image-form" onSubmit={handleProfileImageUpdate}>
+                <label htmlFor="profileImageFile">
+                  <IoImageOutline aria-hidden />
+                  Profile picture
+                </label>
+                <div className="profile-upload-preview">
+                  {profileImagePreview ? (
+                    <img src={profileImagePreview} alt="Profile preview" />
+                  ) : (
+                    <IoPersonOutline aria-hidden />
+                  )}
+                  <span>Choose a JPG, PNG, or WEBP image from your device.</span>
+                </div>
+                <div>
+                  <input
+                    id="profileImageFile"
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setProfileImageFile(file);
+                      setProfileImagePreview(URL.createObjectURL(file));
+                    }}
+                  />
+                  <button type="submit" disabled={!profileImageFile}>
+                    Upload
+                  </button>
+                </div>
+              </form>
             </section>
+
+            <section className="profile-settings-card">
+              <div className="profile-settings-card-heading">
+                <IoSparklesOutline aria-hidden />
+                <div>
+                  <p className="section-kicker">Shortcuts</p>
+                  <h2>Account options</h2>
+                </div>
+              </div>
+              <div className="profile-options-grid">
+                {quickLinks.map((item) => (
+                  <Link to={item.to} key={item.label}>
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+            {user.role === "customer" && (
+              <section className="profile-settings-card">
+                <div className="profile-settings-card-heading">
+                  <IoShieldCheckmarkOutline aria-hidden />
+                  <div>
+                    <p className="section-kicker">Access request</p>
+                    <h2>Request Shop Admin access</h2>
+                  </div>
+                </div>
+                <p className="profile-settings-copy">
+                  Current status: {user.adminRequest?.status || "none"}.
+                </p>
+                <form className="profile-password-form" onSubmit={handleAdminAccessRequest}>
+                  <textarea
+                    className="form-control"
+                    value={adminRequestMessage}
+                    onChange={(e) => setAdminRequestMessage(e.target.value)}
+                    placeholder="Tell the super admin why you need shop admin access..."
+                    rows="3"
+                    disabled={user.adminRequest?.status === "pending"}
+                  />
+                  <button
+                    type="submit"
+                    className="checkout-primary-button"
+                    disabled={user.adminRequest?.status === "pending"}
+                  >
+                    {user.adminRequest?.status === "pending"
+                      ? "Request pending"
+                      : "Send request"}
+                  </button>
+                </form>
+              </section>
+            )}
 
             <section className="profile-settings-card">
               <div className="profile-settings-card-heading">

@@ -1,19 +1,26 @@
 import {
   fetchUserApi,
+  deleteUserApi,
+  getAdminAccessRequestsApi,
+  getAllUsersApi,
   getAllUsersTimeFrame,
   loginApi,
   logoutApi,
   refreshTokenApi,
   registerApi,
+  requestAdminAccessApi,
   resendVerificationLinkApi,
+  respondAdminAccessRequestApi,
   updatePwApi,
+  updateUserByAdminApi,
   updateUserApi,
+  updateUserRoleApi,
   verifyEmailAndSendOTPApi,
   verifyOTPApi,
   verifyUserApi,
 } from "./userApi";
 import { toast } from "react-toastify";
-import { resetUser, setTimeFramePastWeekUsers, setTimeFramePresentWeekUsers, setUser } from "./userSlice.js";
+import { resetUser, setAdminAccessRequests, setAllUsers, setTimeFramePastWeekUsers, setTimeFramePresentWeekUsers, setUser } from "./userSlice.js";
 import { createRecentActivity } from "../recentActivity/recentActivityAPI.js";
 
 // login action
@@ -234,8 +241,11 @@ export const updateUserAction = (obj) => async (dispatch) => {
       entityType: "user"
     }
     dispatch(createRecentActivity(obj))
+    toast[status](message)
+    return true;
   }
   toast[status](message)
+  return false;
 }
 
 // resending the verification link 
@@ -250,3 +260,82 @@ export const resendVerificationLinkAction = (email) => async () => {
     return true
   }
 }
+
+export const getAllUsersAction = () => async (dispatch) => {
+  const { status, users } = await getAllUsersApi();
+  if (status === "success") {
+    dispatch(setAllUsers(users));
+    return true;
+  }
+  return false;
+}
+
+export const updateUserByAdminAction = (id, obj) => async (dispatch) => {
+  const pending = updateUserByAdminApi(id, obj);
+  toast.promise(pending, { pending: "Updating user..." });
+  const { status, message } = await pending;
+  toast[status](message);
+  if (status === "success") {
+    dispatch(getAllUsersAction());
+    return true;
+  }
+  return false;
+};
+
+export const updateUserRoleAction = (id, role) => async (dispatch) => {
+  const pending = updateUserRoleApi(id, role);
+  toast.promise(pending, { pending: "Updating role..." });
+  const { status, message } = await pending;
+  toast[status](message);
+  if (status === "success") {
+    dispatch(getAllUsersAction());
+    dispatch(getAdminAccessRequestsAction());
+    return true;
+  }
+  return false;
+};
+
+export const deleteUserAction = (id) => async (dispatch) => {
+  const pending = deleteUserApi(id);
+  toast.promise(pending, { pending: "Deleting user..." });
+  const { status, message } = await pending;
+  toast[status](message);
+  if (status === "success") {
+    dispatch(getAllUsersAction());
+    return true;
+  }
+  return false;
+};
+
+export const requestAdminAccessAction = (message) => async (dispatch) => {
+  const pending = requestAdminAccessApi(message);
+  toast.promise(pending, { pending: "Sending request..." });
+  const { status, message: responseMessage, user } = await pending;
+  toast[status](responseMessage);
+  if (status === "success" && user) {
+    dispatch(setUser(user));
+    return true;
+  }
+  return false;
+};
+
+export const getAdminAccessRequestsAction = () => async (dispatch) => {
+  const { status, users } = await getAdminAccessRequestsApi();
+  if (status === "success") {
+    dispatch(setAdminAccessRequests(users));
+    return true;
+  }
+  return false;
+};
+
+export const respondAdminAccessRequestAction = (id, decision, responseMessage) => async (dispatch) => {
+  const pending = respondAdminAccessRequestApi(id, decision, responseMessage);
+  toast.promise(pending, { pending: "Updating request..." });
+  const { status, message } = await pending;
+  toast[status](message);
+  if (status === "success") {
+    dispatch(getAdminAccessRequestsAction());
+    return true;
+  }
+  return false;
+};

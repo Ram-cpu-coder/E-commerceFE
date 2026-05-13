@@ -4,6 +4,8 @@ const initialState = {
   user: {},
   timeFramePresentWeekUsers: [],
   timeFramePastWeekUsers: [],
+  allUsers: [],
+  adminAccessRequests: [],
 };
 
 const userSlice = createSlice({
@@ -25,9 +27,15 @@ const userSlice = createSlice({
     setTimeFramePastWeekUsers: (state, { payload }) => {
       state.timeFramePastWeekUsers = payload || []
     },
+    setAdminAccessRequests: (state, { payload }) => {
+      state.adminAccessRequests = payload || []
+    },
+    setAllUsers: (state, { payload }) => {
+      state.allUsers = payload || []
+    },
   },
 });
 
-export const { setUser, resetUser, setMenu, setTimeFramePresentWeekUsers, setTimeFramePastWeekUsers } = userSlice.actions;
+export const { setUser, resetUser, setMenu, setTimeFramePresentWeekUsers, setTimeFramePastWeekUsers, setAdminAccessRequests, setAllUsers } = userSlice.actions;
 
 export default userSlice.reducer;

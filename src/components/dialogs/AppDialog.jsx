@@ -57,7 +57,9 @@ const AppDialog = ({
 
         <div className="app-dialog-copy">
           <h3>{title}</h3>
-          {message && <p>{message}</p>}
+          {message && (
+            React.isValidElement(message) ? message : <p>{message}</p>
+          )}
         </div>
 
         <div className="app-dialog-actions">

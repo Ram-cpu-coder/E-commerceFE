@@ -164,6 +164,7 @@ export const ProductTable = () => {
             <tr>
               <th>Image</th>
               <th>Product</th>
+              <th>Shop</th>
               <th>Category</th>
               <th>Price</th>
               <th>Stock</th>
@@ -186,6 +187,11 @@ export const ProductTable = () => {
                     <b>{product.name}</b>
                     <br />
                     <span className="text-muted small">{product.status}</span>
+                  </td>
+                  <td>
+                    <span className="admin-stock-pill success">
+                      {product.shopName || "Unassigned"}
+                    </span>
                   </td>
                   <td>
                     {getCategoryNameById(product.category) || "Uncategorized"}
@@ -221,7 +227,7 @@ export const ProductTable = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center py-4">
+                <td colSpan="8" className="text-center py-4">
                   <div>
                     <strong>No products found</strong>
                     <div className="text-muted small">

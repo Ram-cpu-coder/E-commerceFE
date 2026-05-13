@@ -120,8 +120,8 @@ const Header = ({ handleCart, setNavHeight }) => {
             </button>
 
             {user?._id ? (
-              <Link to="/user/logout" className="px-3 py-2 nav-link nav-link-app">
-                Log out
+              <Link to="/shop/register" className="px-3 py-2 nav-link nav-link-app">
+                Sell
               </Link>
             ) : (
               <Link to="/login" className="px-3 py-2 nav-link nav-link-app">

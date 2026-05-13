@@ -122,3 +122,63 @@ export const getAllUsersTimeFrame = (startTime, endTime) => {
     isPrivate: true,
   })
 }
+
+export const getAllUsersApi = () => {
+  return apiProcessor({
+    method: "get",
+    url: `${authUrl}/users`,
+    isPrivate: true,
+  });
+};
+
+export const updateUserByAdminApi = (id, obj) => {
+  return apiProcessor({
+    method: "put",
+    url: `${authUrl}/users/${id}`,
+    data: obj,
+    isPrivate: true,
+  });
+};
+
+export const updateUserRoleApi = (id, role) => {
+  return apiProcessor({
+    method: "put",
+    url: `${authUrl}/users/${id}/role`,
+    data: { role },
+    isPrivate: true,
+  });
+};
+
+export const deleteUserApi = (id) => {
+  return apiProcessor({
+    method: "delete",
+    url: `${authUrl}/${id}`,
+    isPrivate: true,
+  });
+};
+
+export const requestAdminAccessApi = (message) => {
+  return apiProcessor({
+    method: "post",
+    url: `${authUrl}/admin-request`,
+    data: { message },
+    isPrivate: true,
+  });
+};
+
+export const getAdminAccessRequestsApi = () => {
+  return apiProcessor({
+    method: "get",
+    url: `${authUrl}/admin-requests`,
+    isPrivate: true,
+  });
+};
+
+export const respondAdminAccessRequestApi = (id, decision, responseMessage) => {
+  return apiProcessor({
+    method: "put",
+    url: `${authUrl}/admin-requests/${id}`,
+    data: { decision, responseMessage },
+    isPrivate: true,
+  });
+};

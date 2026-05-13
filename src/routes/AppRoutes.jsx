@@ -10,6 +10,16 @@ const Register = lazy(() => import("../pages/auth/Register"));
 const ForgetPassword = lazy(() => import("../pages/auth/ForgetPassword"));
 const Login = lazy(() => import("../pages/auth/Login"));
 const Dashboard = lazy(() => import("../pages/dashboard/Dashboard.jsx"));
+const AdminCustomers = lazy(() => import("../pages/dashboard/AdminCustomers.jsx"));
+const SuperAdminDashboard = lazy(() => import("../pages/superadmin/SuperAdminDashboard.jsx"));
+const SuperAdminApplications = lazy(() => import("../pages/superadmin/SuperAdminApplications.jsx"));
+const SuperAdminGlobalOrders = lazy(() => import("../pages/superadmin/SuperAdminGlobalOrders.jsx"));
+const SuperAdminPayments = lazy(() => import("../pages/superadmin/SuperAdminPayments.jsx"));
+const SuperAdminProductModeration = lazy(() => import("../pages/superadmin/SuperAdminProductModeration.jsx"));
+const SuperAdminPlatformSettings = lazy(() => import("../pages/superadmin/SuperAdminPlatformSettings.jsx"));
+const SuperAdminAuditLogs = lazy(() => import("../pages/superadmin/SuperAdminAuditLogs.jsx"));
+const SuperAdminPortal = lazy(() => import("../pages/superadmin/SuperAdminPortal.jsx"));
+const SuperAdminShops = lazy(() => import("../pages/superadmin/SuperAdminShops.jsx"));
 const CategoryLanding = lazy(() => import("../pages/CategoryLanding"));
 const Profile = lazy(() => import("../pages/account/Profile"));
 const VerifyUser = lazy(() => import("../pages/auth/VerifyUser"));
@@ -40,6 +50,7 @@ const AddressUpdate = lazy(
 );
 const Logout = lazy(() => import("../pages/auth/Logout.jsx"));
 const Shop = lazy(() => import("../pages/shop/Shop.jsx"));
+const ShopRegister = lazy(() => import("../pages/shop/ShopRegister.jsx"));
 const WishList = lazy(() => import("../pages/wishList/WishList.jsx"));
 const AdminReview = lazy(() => import("../pages/review/AdminReview.jsx"));
 const FeatureBanner = lazy(
@@ -83,7 +94,19 @@ const AdminRoute = ({ children }) => {
     return <RouteFallback />;
   }
 
-  return user.role === "admin" ? children : <Navigate to="/login" replace />;
+  return ["admin", "superadmin"].includes(user.role)
+    ? children
+    : <Navigate to="/login" replace />;
+};
+
+const SuperAdminRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.userInfo);
+  const accessJWT = sessionStorage.getItem("accessJWT");
+
+  if (!accessJWT) return <Navigate to="/login" replace />;
+  if (!user || !Object.keys(user).length) return <RouteFallback />;
+
+  return user.role === "superadmin" ? children : <Navigate to="/admin/adminDashboard" replace />;
 };
 
 const AppRoutes = () => {
@@ -97,6 +120,7 @@ const AppRoutes = () => {
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/shop/register" element={<ShopRegister />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgetpassword" element={<ForgetPassword />} />
@@ -138,6 +162,79 @@ const AppRoutes = () => {
           }
         >
           <Route path="adminDashboard" element={<Dashboard />} />
+          <Route
+            path="superadmin-dashboard"
+            element={
+              <SuperAdminRoute>
+                <SuperAdminDashboard />
+              </SuperAdminRoute>
+            }
+          />
+          <Route
+            path="shop-applications"
+            element={
+              <SuperAdminRoute>
+                <SuperAdminApplications />
+              </SuperAdminRoute>
+            }
+          />
+          <Route
+            path="global-orders"
+            element={
+              <SuperAdminRoute>
+                <SuperAdminGlobalOrders />
+              </SuperAdminRoute>
+            }
+          />
+          <Route
+            path="payments"
+            element={
+              <SuperAdminRoute>
+                <SuperAdminPayments />
+              </SuperAdminRoute>
+            }
+          />
+          <Route
+            path="product-moderation"
+            element={
+              <SuperAdminRoute>
+                <SuperAdminProductModeration />
+              </SuperAdminRoute>
+            }
+          />
+          <Route
+            path="platform-settings"
+            element={
+              <SuperAdminRoute>
+                <SuperAdminPlatformSettings />
+              </SuperAdminRoute>
+            }
+          />
+          <Route
+            path="audit-logs"
+            element={
+              <SuperAdminRoute>
+                <SuperAdminAuditLogs />
+              </SuperAdminRoute>
+            }
+          />
+          <Route path="customers" element={<AdminCustomers />} />
+          <Route
+            path="superadmin"
+            element={
+              <SuperAdminRoute>
+                <SuperAdminPortal />
+              </SuperAdminRoute>
+            }
+          />
+          <Route
+            path="shops"
+            element={
+              <SuperAdminRoute>
+                <SuperAdminShops />
+              </SuperAdminRoute>
+            }
+          />
           <Route path="products" element={<ProductList />} />
           <Route path="products/new" element={<AddNewProduct />} />
           <Route path="products/edit/:_id" element={<EditProduct />} />

@@ -38,8 +38,11 @@ const ProductsDetails = ({
     }
   };
 
-  const handleOnAddCart = (_id, quantity) => {
-    dispatch(createCartAction(_id, quantity));
+  const handleOnAddCart = async (_id, quantity) => {
+    const added = await dispatch(createCartAction(_id, quantity));
+    if (added) {
+      setQuantity(1);
+    }
   };
 
   const wishListItem = wishlist.find(

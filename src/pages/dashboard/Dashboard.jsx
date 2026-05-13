@@ -9,6 +9,7 @@ import { RiRobot3Line } from "react-icons/ri";
 import TopBar from "./TopBar.jsx";
 import MidPart from "./MidPart.jsx";
 import RecentActivities from "./RecentActivities.jsx";
+import Skeleton from "@mui/material/Skeleton";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -27,8 +28,14 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="text-center" style={{ minHeight: "100vh" }}>
-        Loading...
+      <div className="dashboard-skeleton">
+        <Skeleton variant="rounded" height={150} />
+        <div className="dashboard-skeleton-grid">
+          <Skeleton variant="rounded" height={160} />
+          <Skeleton variant="rounded" height={160} />
+          <Skeleton variant="rounded" height={160} />
+        </div>
+        <Skeleton variant="rounded" height={360} />
       </div>
     );
   }
