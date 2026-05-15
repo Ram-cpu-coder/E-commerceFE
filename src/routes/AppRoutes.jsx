@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Route, Routes, Navigate, useParams } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation, useParams } from "react-router-dom";
 
 import DefaultLayout from "../components/layouts/DefaultLayout";
 import HomePage from "../pages/home/HomePage";
@@ -69,8 +69,14 @@ const UpdateFeatureBanner = lazy(
   () => import("../pages/FeatureBanner/UpdateFeatureBanner.jsx"),
 );
 
-const ProtectedRoutes = ({ isAuth, children }) => {
-  return isAuth ? children : <Navigate to="/login" replace />;
+const hasStoredAuth = () =>
+  Boolean(sessionStorage.getItem("accessJWT") || localStorage.getItem("refreshJWT"));
+
+const ProtectedRoutes = ({ children }) => {
+  const location = useLocation();
+  return hasStoredAuth()
+    ? children
+    : <Navigate to="/login" replace state={{ from: location }} />;
 };
 
 /** Old app used `/:mongoId` for products; redirect to `/product/:id`. */
@@ -84,10 +90,10 @@ const LegacyProductRedirect = () => {
 
 const AdminRoute = ({ children }) => {
   const { user } = useSelector((state) => state.userInfo);
-  const accessJWT = sessionStorage.getItem("accessJWT");
+  const location = useLocation();
 
-  if (!accessJWT) {
-    return <Navigate to="/login" replace />;
+  if (!hasStoredAuth()) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   if (!user || !Object.keys(user).length) {
@@ -101,19 +107,15 @@ const AdminRoute = ({ children }) => {
 
 const SuperAdminRoute = ({ children }) => {
   const { user } = useSelector((state) => state.userInfo);
-  const accessJWT = sessionStorage.getItem("accessJWT");
+  const location = useLocation();
 
-  if (!accessJWT) return <Navigate to="/login" replace />;
+  if (!hasStoredAuth()) return <Navigate to="/login" replace state={{ from: location }} />;
   if (!user || !Object.keys(user).length) return <RouteFallback />;
 
   return user.role === "superadmin" ? children : <Navigate to="/admin/adminDashboard" replace />;
 };
 
 const AppRoutes = () => {
-  const accessJWT = sessionStorage.getItem("accessJWT");
-
-  const isAuthenticated = !!accessJWT;
-
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
@@ -137,7 +139,7 @@ const AppRoutes = () => {
         <Route
           path="/user"
           element={
-            <ProtectedRoutes isAuth={isAuthenticated}>
+            <ProtectedRoutes>
               <DefaultLayout />
             </ProtectedRoutes>
           }

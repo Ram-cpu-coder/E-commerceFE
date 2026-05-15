@@ -16,12 +16,15 @@ const SuperAdminAuditLogs = () => {
   const dispatch = useDispatch();
   const [logs, setLogs] = useState([]);
   const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     dispatch(setMenu("Audit Logs"));
     const loadLogs = async () => {
+      setLoading(true);
       const result = await getAuditLogsApi();
       setLogs(result.status === "success" ? result.logs || [] : []);
+      setLoading(false);
     };
     loadLogs();
   }, [dispatch]);
@@ -69,7 +72,11 @@ const SuperAdminAuditLogs = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredLogs.length ? filteredLogs.map((log) => (
+              {loading ? (
+                Array.from({ length: 6 }, (_, index) => (
+                  <tr key={index}><td colSpan="5"><span className="app-skeleton line wide" /></td></tr>
+                ))
+              ) : filteredLogs.length ? filteredLogs.map((log) => (
                 <tr key={log._id}>
                   <td>{dateText(log.createdAt)}</td>
                   <td><strong>{log.actorName || "System"}</strong><div className="text-muted small">{log.actorEmail || "No email"}</div></td>

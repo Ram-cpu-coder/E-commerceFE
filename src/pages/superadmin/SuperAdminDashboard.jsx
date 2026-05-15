@@ -112,6 +112,14 @@ const SuperAdminDashboard = () => {
     },
   ];
 
+  const renderSkeletonRows = (count = 5) => (
+    <div className="skeleton-stack">
+      {Array.from({ length: count }, (_, index) => (
+        <span key={index} className="app-skeleton line wide" />
+      ))}
+    </div>
+  );
+
   const openReview = (application, decision) => {
     setReviewTarget(application);
     setReviewDecision(decision);
@@ -175,11 +183,13 @@ const SuperAdminDashboard = () => {
         </div>
 
         <div className="platform-metric-grid">
-          {metricCards.map((card) => (
+          {loading ? Array.from({ length: 6 }, (_, index) => (
+            <span key={index} className="app-skeleton platform-metric-skeleton" />
+          )) : metricCards.map((card) => (
             <div key={card.label} className={`platform-metric-card ${card.tone}`}>
               <span>{card.icon}</span>
               <small>{card.label}</small>
-              <strong>{loading ? "..." : card.value}</strong>
+              <strong>{card.value}</strong>
             </div>
           ))}
         </div>
@@ -194,7 +204,7 @@ const SuperAdminDashboard = () => {
               <IoTrendingUpOutline aria-hidden />
             </div>
             <div className="shop-performance-list">
-              {(overview?.shopPerformance || []).slice(0, 8).map((shop) => (
+              {loading ? renderSkeletonRows(6) : (overview?.shopPerformance || []).slice(0, 8).map((shop) => (
                 <div key={shop._id} className="shop-performance-row">
                   <div>
                     <strong>{shop.name}</strong>
@@ -206,7 +216,7 @@ const SuperAdminDashboard = () => {
                   <b>{money(shop.revenue)}</b>
                 </div>
               ))}
-              {!overview?.shopPerformance?.length && (
+              {!loading && !overview?.shopPerformance?.length && (
                 <div className="shop-detail-empty">No shop performance data yet.</div>
               )}
             </div>
@@ -221,13 +231,13 @@ const SuperAdminDashboard = () => {
               <IoTrendingDownOutline aria-hidden />
             </div>
             <div className="platform-attention-list">
-              {(overview?.lowPerformingShops || []).map((shop) => (
+              {loading ? renderSkeletonRows(3) : (overview?.lowPerformingShops || []).map((shop) => (
                 <div key={shop._id}>
                   <strong>{shop.name}</strong>
                   <span>No shop orders yet. Review products, inventory, and visibility.</span>
                 </div>
               ))}
-              {!overview?.lowPerformingShops?.length && (
+              {!loading && !overview?.lowPerformingShops?.length && (
                 <div className="shop-detail-empty">No weak shops detected.</div>
               )}
             </div>
@@ -264,7 +274,13 @@ const SuperAdminDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {applications.length ? applications.map((application) => (
+              {loading ? (
+                Array.from({ length: 4 }, (_, index) => (
+                  <tr key={index}>
+                    <td colSpan="6"><span className="app-skeleton line wide" /></td>
+                  </tr>
+                ))
+              ) : applications.length ? applications.map((application) => (
                 <tr key={application._id}>
                   <td>
                     <strong>{application.shopName}</strong>

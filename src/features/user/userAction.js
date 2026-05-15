@@ -24,7 +24,7 @@ import { resetUser, setAdminAccessRequests, setAllUsers, setTimeFramePastWeekUse
 import { createRecentActivity } from "../recentActivity/recentActivityAPI.js";
 
 // login action
-export const loginAction = (form, navigate) => async (dispatch) => {
+export const loginAction = (form, navigate, redirectTo = "/") => async (dispatch) => {
   const pending = loginApi({ ...form });
   toast.promise(pending, {
     pending: "Logging..."
@@ -39,7 +39,7 @@ export const loginAction = (form, navigate) => async (dispatch) => {
     //update the store
     await dispatch(setUser(userInfo));
     await dispatch(fetchUserAction())
-    navigate("/")
+    navigate(redirectTo, { replace: true })
   }
 };
 

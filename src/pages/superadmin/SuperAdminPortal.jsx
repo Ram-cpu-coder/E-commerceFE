@@ -72,6 +72,12 @@ const formatDate = (value) => {
     : date.toLocaleDateString();
 };
 
+const money = (value) =>
+  Number(value || 0).toLocaleString(undefined, {
+    style: "currency",
+    currency: "AUD",
+  });
+
 const SuperAdminPortal = () => {
   const dispatch = useDispatch();
   const [search, setSearch] = useState("");
@@ -293,6 +299,8 @@ const SuperAdminPortal = () => {
               <tr>
                 <th>Shop</th>
                 <th>Shop Admin</th>
+                <th>Revenue</th>
+                <th>Orders</th>
                 <th>Status</th>
                 <th>Updated</th>
                 <th>Actions</th>
@@ -314,6 +322,8 @@ const SuperAdminPortal = () => {
                       <strong>{shop.adminName || "Unassigned"}</strong>
                       <div className="text-muted small">{shop.adminEmail || "No admin email"}</div>
                     </td>
+                    <td>{money(shop.revenue)}</td>
+                    <td>{shop.orders || 0}</td>
                     <td>
                       <span
                         className={`admin-stock-pill ${
@@ -348,7 +358,7 @@ const SuperAdminPortal = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="text-center py-4">
+                  <td colSpan="7" className="text-center py-4">
                     No shops found.
                   </td>
                 </tr>

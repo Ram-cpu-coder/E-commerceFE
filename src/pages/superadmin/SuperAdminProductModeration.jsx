@@ -16,10 +16,13 @@ const SuperAdminProductModeration = () => {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
   const [updatingId, setUpdatingId] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const loadProducts = async () => {
+    setLoading(true);
     const result = await getAdminProductApi();
     setProducts(result.status === "success" ? result.products || [] : []);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -89,7 +92,11 @@ const SuperAdminProductModeration = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.length ? filteredProducts.map((product) => (
+              {loading ? (
+                Array.from({ length: 6 }, (_, index) => (
+                  <tr key={index}><td colSpan="7"><span className="app-skeleton line wide" /></td></tr>
+                ))
+              ) : filteredProducts.length ? filteredProducts.map((product) => (
                 <tr key={product._id}>
                   <td><strong>{product.name}</strong><div className="text-muted small">{product._id}</div></td>
                   <td>{product.shopName || "Unassigned"}</td>

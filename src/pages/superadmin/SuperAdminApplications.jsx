@@ -22,10 +22,13 @@ const SuperAdminApplications = () => {
   const [reviewDecision, setReviewDecision] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const loadApplications = useCallback(async () => {
+    setLoading(true);
     const result = await getShopApplicationsApi(statusFilter);
     setApplications(result.status === "success" ? result.applications || [] : []);
+    setLoading(false);
   }, [statusFilter]);
 
   useEffect(() => {
@@ -109,7 +112,11 @@ const SuperAdminApplications = () => {
               </tr>
             </thead>
             <tbody>
-              {applications.length ? applications.map((item) => (
+              {loading ? (
+                Array.from({ length: 5 }, (_, index) => (
+                  <tr key={index}><td colSpan="7"><span className="app-skeleton line wide" /></td></tr>
+                ))
+              ) : applications.length ? applications.map((item) => (
                 <tr key={item._id}>
                   <td><strong>{item.shopName}</strong><div className="text-muted small">{item.address}</div></td>
                   <td><strong>{item.ownerFirstName} {item.ownerLastName}</strong><div className="text-muted small">{item.ownerEmail}</div></td>

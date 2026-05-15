@@ -97,6 +97,21 @@ const Header = ({ handleCart, setNavHeight }) => {
           className="order-0 ms-auto d-none d-md-block d-lg-none"
         />
 
+        {user?._id && (
+          <Link
+            to="/user/account"
+            className="navbar-profile-mobile"
+            title="Profile settings"
+            aria-label="Open profile settings"
+          >
+            {user?.image ? (
+              <img src={user.image} alt={user?.fName || "Profile"} />
+            ) : (
+              <span>{(user?.fName?.[0] || "U").toUpperCase()}</span>
+            )}
+          </Link>
+        )}
+
         <Navbar.Collapse id="navbar-right" className="order-3 order-lg-0">
           <Nav className="ms-auto align-items-lg-center">
             {user?.role === "admin" ? (

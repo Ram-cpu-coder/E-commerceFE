@@ -16,18 +16,20 @@ const LoginForm = () => {
   const { user } = useSelector((state) => state.userInfo);
 
   // set sendTo location depending upon user url.
-  const sendTo = location?.state?.from?.location?.pathname || "/login";
+  const sendTo = location?.state?.from?.pathname || "/";
 
   useEffect(() => {
     //navigate to location when the user travelled from
-    user?._id && navigate(sendTo);
+    if (user?._id) {
+      navigate(sendTo === "/login" ? "/" : sendTo, { replace: true });
+    }
   }, [user._id, navigate, sendTo]);
 
   const handleOnSubmit = async (e) => {
     //prevent default
     e.preventDefault();
     // call loginAction
-    dispatch(loginAction(form, navigate));
+    dispatch(loginAction(form, navigate, sendTo === "/login" ? "/" : sendTo));
   };
   return (
     <div>

@@ -1,26 +1,18 @@
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
-import Typography from "@mui/material/Typography";
-
 export default function RouteFallback() {
   return (
-    <Box
+    <div
       role="status"
       aria-live="polite"
       aria-label="Loading page"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 2,
-        minHeight: "40vh",
-      }}
+      className="route-skeleton-page"
     >
-      <CircularProgress size={40} />
-      <Typography variant="body2" color="text.secondary">
-        Loading…
-      </Typography>
-    </Box>
+      <span className="app-skeleton route-skeleton-hero" />
+      <div className="route-skeleton-grid">
+        <span className="app-skeleton route-skeleton-card" />
+        <span className="app-skeleton route-skeleton-card" />
+        <span className="app-skeleton route-skeleton-card" />
+      </div>
+      <span className="app-skeleton route-skeleton-table" />
+    </div>
   );
 }

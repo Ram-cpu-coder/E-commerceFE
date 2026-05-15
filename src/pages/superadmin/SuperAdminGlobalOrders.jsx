@@ -18,12 +18,15 @@ const SuperAdminGlobalOrders = () => {
   const [orders, setOrders] = useState([]);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     dispatch(setMenu("Global Orders"));
     const loadOrders = async () => {
+      setLoading(true);
       const result = await getAllOrdersNoPagination();
       setOrders(result.status === "success" ? result.orders || [] : []);
+      setLoading(false);
     };
     loadOrders();
   }, [dispatch]);
@@ -91,13 +94,28 @@ const SuperAdminGlobalOrders = () => {
                 <tr key={order._id}>
                   <td><strong>{String(order._id).slice(-8).toUpperCase()}</strong><div className="text-muted small">{order._id}</div></td>
                   <td>{order.userId?.email || order.userId || "Customer unavailable"}</td>
-                  <td>{(order.fulfillments || []).map((item) => item.shopName || "Shop").join(", ") || "No shop split"}</td>
+                  <td>
+                    <div className="global-order-shop-list">
+                      {(order.fulfillments || []).length ? order.fulfillments.map((item) => (
+                        <span key={`${order._id}-${item.shopId}`}>
+                          <strong>{item.shopName || "Shop"}</strong>
+                          <small>{money(item.totalAmount)} / {item.status}</small>
+                        </span>
+                      )) : "No shop split"}
+                    </div>
+                  </td>
                   <td>{money(order.totalAmount)}</td>
                   <td><span className={`admin-stock-pill ${order.status === "delivered" ? "success" : order.status === "cancelled" ? "danger" : "warning"}`}>{order.status}</span></td>
                   <td>{dateText(order.createdAt)}</td>
                   <td>{order.shippingAddress || "Address unavailable"}</td>
                 </tr>
-              )) : (
+              )) : loading ? (
+                Array.from({ length: 5 }, (_, index) => (
+                  <tr key={index}>
+                    <td colSpan="7"><span className="app-skeleton line wide" /></td>
+                  </tr>
+                ))
+              ) : (
                 <tr><td colSpan="7" className="text-center py-4">No orders found.</td></tr>
               )}
             </tbody>

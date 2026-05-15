@@ -39,16 +39,19 @@ const SuperAdminShops = () => {
   const [selectedShopId, setSelectedShopId] = useState("");
   const [overview, setOverview] = useState(null);
   const [activeTab, setActiveTab] = useState("Analytics");
-  const [loading, setLoading] = useState(false);
+  const [loadingShops, setLoadingShops] = useState(true);
+  const [loadingOverview, setLoadingOverview] = useState(false);
 
   useEffect(() => {
     dispatch(setMenu("Shops"));
     const loadShops = async () => {
+      setLoadingShops(true);
       const { status, shops: shopList } = await getShopsApi();
       if (status === "success") {
         setShops(shopList || []);
         setSelectedShopId((current) => current || shopList?.[0]?._id || "");
       }
+      setLoadingShops(false);
     };
     loadShops();
   }, [dispatch]);
@@ -56,10 +59,10 @@ const SuperAdminShops = () => {
   useEffect(() => {
     if (!selectedShopId) return;
     const loadOverview = async () => {
-      setLoading(true);
+      setLoadingOverview(true);
       const { status, ...payload } = await getShopOverviewApi(selectedShopId);
       setOverview(status === "success" ? payload : null);
-      setLoading(false);
+      setLoadingOverview(false);
     };
     loadOverview();
   }, [selectedShopId]);
@@ -178,6 +181,15 @@ const SuperAdminShops = () => {
   );
 
   const renderTab = () => {
+    if (loadingOverview) {
+      return (
+        <div className="skeleton-stack">
+          <span className="app-skeleton line wide" />
+          <span className="app-skeleton line" />
+          <span className="app-skeleton block" />
+        </div>
+      );
+    }
     if (!overview) return <div className="shop-detail-empty">Select a shop to view its data.</div>;
     if (activeTab === "Shop Admins") return renderUsers(overview.admins || []);
     if (activeTab === "Products") return renderProducts(overview.products || []);
@@ -244,7 +256,11 @@ const SuperAdminShops = () => {
 
         <div className="superadmin-shop-workspace">
           <aside className="shop-selector-panel">
-            {shops.length ? shops.map((shop) => (
+            {loadingShops ? (
+              <div className="skeleton-stack">
+                {[1, 2, 3, 4].map((item) => <span key={item} className="app-skeleton shop-selector-skeleton" />)}
+              </div>
+            ) : shops.length ? shops.map((shop) => (
               <button
                 type="button"
                 key={shop._id}
@@ -254,7 +270,7 @@ const SuperAdminShops = () => {
                 <IoStorefrontOutline aria-hidden />
                 <span>
                   <strong>{shop.name}</strong>
-                  <small>{shop.adminName || "Unassigned Shop Admin"}</small>
+                  <small>{money(shop.revenue)} / {shop.orders || 0} orders</small>
                 </span>
               </button>
             )) : (
@@ -269,11 +285,13 @@ const SuperAdminShops = () => {
                 <h2>{selectedShop?.name || "Select a shop"}</h2>
                 <p>{selectedShop?.description || "Everything related to this shop appears here."}</p>
               </div>
-              {loading && <span className="admin-stock-pill warning">Loading</span>}
+              {loadingOverview && <span className="admin-stock-pill warning">Loading</span>}
             </div>
 
             <div className="shop-stat-grid">
-              {stats.map((stat) => (
+              {loadingOverview ? [1, 2, 3, 4].map((item) => (
+                <span key={item} className="app-skeleton shop-stat-skeleton" />
+              )) : stats.map((stat) => (
                 <div key={stat.label} className="shop-stat-card">
                   {stat.icon}
                   <span>{stat.label}</span>

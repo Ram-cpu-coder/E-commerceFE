@@ -12,12 +12,15 @@ const money = (value) => Number(value || 0).toLocaleString(undefined, { style: "
 const SuperAdminPayments = () => {
   const dispatch = useDispatch();
   const [overview, setOverview] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     dispatch(setMenu("Payments & Payouts"));
     const loadOverview = async () => {
+      setLoading(true);
       const result = await getPlatformOverviewApi();
       setOverview(result.status === "success" ? result : null);
+      setLoading(false);
     };
     loadOverview();
   }, [dispatch]);
@@ -39,9 +42,13 @@ const SuperAdminPayments = () => {
         </div>
 
         <div className="platform-metric-grid compact">
-          <div className="platform-metric-card green"><span><IoCashOutline /></span><small>Platform sales</small><strong>{money(metrics.totalRevenue)}</strong></div>
-          <div className="platform-metric-card gold"><span><IoStorefrontOutline /></span><small>Shops earning</small><strong>{shops.filter((shop) => Number(shop.revenue || 0) > 0).length}</strong></div>
-          <div className="platform-metric-card orange"><span><IoCardOutline /></span><small>Payment setup needed</small><strong>{metrics.paymentPendingShops || 0}</strong></div>
+          {loading ? [1, 2, 3].map((item) => <span key={item} className="app-skeleton platform-metric-skeleton" />) : (
+            <>
+              <div className="platform-metric-card green"><span><IoCashOutline /></span><small>Platform sales</small><strong>{money(metrics.totalRevenue)}</strong></div>
+              <div className="platform-metric-card gold"><span><IoStorefrontOutline /></span><small>Shops earning</small><strong>{shops.filter((shop) => Number(shop.revenue || 0) > 0).length}</strong></div>
+              <div className="platform-metric-card orange"><span><IoCardOutline /></span><small>Payment setup needed</small><strong>{metrics.paymentPendingShops || 0}</strong></div>
+            </>
+          )}
         </div>
 
         <div className="platform-grid">
@@ -52,7 +59,11 @@ const SuperAdminPayments = () => {
             <Table responsive className="admin-customers-table mb-0">
               <thead><tr><th>Shop</th><th>Orders</th><th>Revenue owed</th><th>Payment status</th></tr></thead>
               <tbody>
-                {shops.length ? shops.map((shop) => (
+                {loading ? (
+                  Array.from({ length: 5 }, (_, index) => (
+                    <tr key={index}><td colSpan="4"><span className="app-skeleton line wide" /></td></tr>
+                  ))
+                ) : shops.length ? shops.map((shop) => (
                   <tr key={shop._id}>
                     <td><strong>{shop.name}</strong><div className="text-muted small">{shop.adminEmail || "No admin email"}</div></td>
                     <td>{shop.orders}</td>
@@ -69,7 +80,11 @@ const SuperAdminPayments = () => {
               <div><p className="section-kicker">Action required</p><h2>Unverified payout accounts</h2></div>
             </div>
             <div className="platform-attention-list">
-              {pending.length ? pending.map((shop) => (
+              {loading ? (
+                <div className="skeleton-stack">
+                  {[1, 2, 3].map((item) => <span key={item} className="app-skeleton line wide" />)}
+                </div>
+              ) : pending.length ? pending.map((shop) => (
                 <div key={shop._id}>
                   <strong>{shop.name}</strong>
                   <span>{shop.paymentProvider || "manual"} / {shop.payoutAccountEmail || "No payout email"}</span>

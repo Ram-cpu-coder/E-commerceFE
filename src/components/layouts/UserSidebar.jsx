@@ -185,7 +185,8 @@ export const UserSidebar = ({ collapsed = false, user: layoutUser }) => {
                 ? "active"
                 : ""
             }`}
-            title={collapsed ? title : undefined}
+            title={title}
+            aria-label={title}
             onClick={() => {
               dispatch(setSelectedCategory(null));
             }}
