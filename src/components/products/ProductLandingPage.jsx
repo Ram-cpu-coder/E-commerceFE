@@ -10,16 +10,14 @@ import {
   deleteWishlistItemAction,
   getWishlistAction,
 } from "../../features/wishlist/wishlistAction";
-import { getPubReviewAction } from "../../features/reviews/reviewAction";
 import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
+import ProductsImages from "./ProductsImages";
+import ProductsDetails from "./ProductsDetails";
+import Description from "./Description";
 
-// Lazy-loaded components
-const ProductsImages = lazy(() => import("./ProductsImages"));
-const ProductsDetails = lazy(() => import("./ProductsDetails"));
 const ProductReviews = lazy(() => import("./ProductReviews"));
 const ShareProduct = lazy(() => import("./ShareProduct"));
-const Description = lazy(() => import("./Description"));
 
 const calculateAvgRating = (reviews) => {
   if (!reviews?.length) return 1;
@@ -36,11 +34,10 @@ const ProductLandingPage = () => {
   const { wishlist } = useSelector((state) => state.wishlistSliceInfo);
   const { user } = useSelector((state) => state.userInfo);
 
-  const [loading, setLoading] = useState(true);
-  const [showReviews, setShowReviews] = useState(false);
-
   const favourite = wishlist?.some((item) => item.productId === id);
   const hasCurrentProduct = selectedProduct?._id === id;
+  const [loading, setLoading] = useState(!hasCurrentProduct);
+  const [showReviews, setShowReviews] = useState(false);
 
   useEffect(() => {
     if (!selectedProduct?.name || selectedProduct._id !== id) return;
@@ -51,21 +48,16 @@ const ProductLandingPage = () => {
     };
   }, [id, selectedProduct?._id, selectedProduct?.name]);
 
-  // --- Fetch product, reviews, wishlist once ---
   useEffect(() => {
-    let isMounted = true; // prevent state updates if component unmounts
+    let isMounted = true;
 
     const fetchData = async () => {
-      setLoading(true);
-
-      // 1. Fetch product if not already loaded or different product
-      if (!hasCurrentProduct) {
+      const needsProduct = selectedProduct?._id !== id;
+      if (needsProduct) {
+        setLoading(true);
         await dispatch(getSingleProductAction(id));
       }
 
-      await dispatch(getPubReviewAction(id));
-
-      // 3. Fetch wishlist only if user exists and wishlist is empty
       if (user?._id && (wishlist?.length || 0) === 0) {
         await dispatch(getWishlistAction());
       }
@@ -81,18 +73,15 @@ const ProductLandingPage = () => {
   }, [
     dispatch,
     id,
-    hasCurrentProduct,
+    selectedProduct?._id,
     user?._id,
     wishlist?.length,
   ]);
 
-  // --- Lazy-load reviews after a short delay ---
   useEffect(() => {
-    const timer = setTimeout(() => setShowReviews(true), 300);
-    return () => clearTimeout(timer);
+    setShowReviews(true);
   }, []);
 
-  // --- Filter reviews for current product ---
   const itemReviews = useMemo(
     () => {
       const apiReviews = selectedReview?.docs || selectedReview?.reviews || [];
@@ -110,7 +99,6 @@ const ProductLandingPage = () => {
     [itemReviews]
   );
 
-  // --- Update product rating if user not logged in ---
   useEffect(() => {
     if (
       !user?._id &&
@@ -178,31 +166,19 @@ const ProductLandingPage = () => {
       </div>
       <div className="d-flex align-items-center w-100 flex-column gap-4 mb-5">
         <div className="product-page-container product-detail-shell product-detail-grid">
-          <Suspense
-            fallback={
-              <Box sx={{ width: 300, height: 300, m: 2 }}>
-                <Skeleton variant="rectangular" width="100%" height="100%" />
-              </Box>
-            }
-          >
-            <ProductsImages selectedProduct={selectedProduct} />
-          </Suspense>
-          <Suspense fallback={<div>Loading Details...</div>}>
-            <ProductsDetails
-              handleFavourite={toggleWishlist}
-              handleDeleteWishlist={toggleWishlist}
-              favourite={favourite}
-              avgRating={avgRating}
-              selectedProduct={selectedProduct}
-              wishlist={wishlist}
-            />
-          </Suspense>
+          <ProductsImages selectedProduct={selectedProduct} />
+          <ProductsDetails
+            handleFavourite={toggleWishlist}
+            handleDeleteWishlist={toggleWishlist}
+            favourite={favourite}
+            avgRating={avgRating}
+            selectedProduct={selectedProduct}
+            wishlist={wishlist}
+          />
         </div>
 
         <div className="product-page-container product-description-shell">
-          <Suspense fallback={<div>Loading description...</div>}>
-            <Description description={selectedProduct.description} />
-          </Suspense>
+          <Description description={selectedProduct.description} />
         </div>
 
         {showReviews && (

@@ -15,7 +15,7 @@ const DefaultLayout = () => {
 
   const location = useLocation();
 
-  const isDashboard = location.pathname.includes("/admin");
+  const isWorkspace = location.pathname.includes("/admin") || location.pathname.includes("/user");
 
   const handleCart = () => {
     if (isCartOpen) {
@@ -29,6 +29,12 @@ const DefaultLayout = () => {
       setIsCartOpen(true);
     }
   };
+
+  useEffect(() => {
+    if (navHeight) {
+      document.documentElement.style.setProperty("--app-nav-height", `${navHeight}px`);
+    }
+  }, [navHeight]);
 
   useEffect(() => {
     if (isCartOpen) {
@@ -78,7 +84,7 @@ const DefaultLayout = () => {
         )}
       </main>
 
-      {!isDashboard && <Footer />}
+      {!isWorkspace && <Footer />}
     </div>
   );
 };

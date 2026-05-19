@@ -3,6 +3,7 @@ import { Route, Routes, Navigate, useLocation, useParams } from "react-router-do
 
 import DefaultLayout from "../components/layouts/DefaultLayout";
 import HomePage from "../pages/home/HomePage";
+import { UserLayout } from "../components/layouts/UserLayout.jsx";
 import { useSelector } from "react-redux";
 import RouteFallback from "../components/RouteFallback.jsx";
 
@@ -115,6 +116,16 @@ const SuperAdminRoute = ({ children }) => {
   return user.role === "superadmin" ? children : <Navigate to="/admin/adminDashboard" replace />;
 };
 
+const CustomerAccountPage = ({ pageTitle, children }) => {
+  const { user } = useSelector((state) => state.userInfo);
+
+  return user?.role === "customer" ? (
+    <UserLayout pageTitle={pageTitle}>{children}</UserLayout>
+  ) : (
+    children
+  );
+};
+
 const AppRoutes = () => {
   return (
     <Suspense fallback={<RouteFallback />}>
@@ -146,13 +157,13 @@ const AppRoutes = () => {
         >
           <Route index element={<Dashboard />} />
           <Route path="account" element={<Profile />} />
-          <Route path="cart" element={<Cart />} />
+          <Route path="cart" element={<CustomerAccountPage pageTitle="Cart"><Cart /></CustomerAccountPage>} />
           <Route path="orders" element={<Order />} />
           <Route path="payment-method" element={<PaymentMethod />} />
           <Route path="logout" element={<Logout />} />
           <Route path="shippingAddress" element={<ShippingAddress />} />
           <Route path="address/:id" element={<AddressUpdate />} />
-          <Route path="wishlist" element={<WishList />} />
+          <Route path="wishlist" element={<CustomerAccountPage pageTitle="Wishlist"><WishList /></CustomerAccountPage>} />
           <Route path="orders/:id" element={<OrderLandingPage />} />
         </Route>
         <Route

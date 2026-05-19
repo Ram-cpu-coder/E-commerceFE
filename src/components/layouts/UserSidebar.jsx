@@ -1,7 +1,7 @@
 import { Stack } from "react-bootstrap";
 import { MdDashboardCustomize, MdRateReview } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { setSelectedCategory } from "../../features/category/categorySlice";
 import { PiSignOutFill } from "react-icons/pi";
 import {
@@ -34,13 +34,13 @@ const sidebarLinks = [
     isSuperAdminOnly: true,
   },
   {
-    icon: <IoShieldCheckmarkOutline />,
+    icon: <IoDocumentTextOutline />,
     title: "Shop Applications",
     to: "/admin/shop-applications",
     isSuperAdminOnly: true,
   },
   {
-    icon: <IoShieldCheckmarkOutline />,
+    icon: <IoPeopleOutline />,
     title: "Users & Roles",
     to: "/admin/superadmin",
     isSuperAdminOnly: true,
@@ -136,7 +136,7 @@ const sidebarLinks = [
     isAdminOnly: true,
   },
   {
-    icon: <IoCartOutline />,
+    icon: <IoBagCheckOutline />,
     title: "My Orders",
     to: "/user/orders?page=1",
     isCustomerOnly: true,
@@ -158,7 +158,9 @@ const sidebarLinks = [
 export const UserSidebar = ({ collapsed = false, user: layoutUser }) => {
   const { user: currentUser, menu } = useSelector((state) => state.userInfo);
   const dispatch = useDispatch();
+  const location = useLocation();
   const user = layoutUser || currentUser;
+  const currentPath = location.pathname;
 
   const visibleLinks =
     user?.role === "superadmin"
@@ -170,23 +172,26 @@ export const UserSidebar = ({ collapsed = false, user: layoutUser }) => {
   return (
     <div className="admin-sidebar-content">
       <Stack gap={1} className="admin-sidebar-nav px-2 pb-3">
-        {visibleLinks.map(({ title, to, icon }) => (
+        {visibleLinks.map(({ title, to, icon }) => {
+          const linkPath = to.split("?")[0];
+          const isActive =
+            currentPath === linkPath ||
+            title === menu ||
+            (menu === "Dashboard" && title === "Analytics Dashboard") ||
+            (menu === "Products" && title === "Product Catalog") ||
+            (menu === "Platform Dashboard" && title === "Platform Dashboard") ||
+            (menu === "Orders" && title === "Order Management") ||
+            (menu === "Reviews" && title === "Review Moderation") ||
+            (menu === "Shops" && title === "Shops");
+
+          return (
           <Link
             key={title}
             to={to}
-            className={`admin-sidebar-link nav-link ${
-              title === menu ||
-              (menu === "Dashboard" && title === "Analytics Dashboard") ||
-              (menu === "Products" && title === "Product Catalog") ||
-              (menu === "Platform Dashboard" && title === "Platform Dashboard") ||
-              (menu === "Orders" && title === "Order Management") ||
-              (menu === "Reviews" && title === "Review Moderation") ||
-              (menu === "Shops" && title === "Shops")
-                ? "active"
-                : ""
-            }`}
+            className={`admin-sidebar-link nav-link ${isActive ? "active" : ""}`}
             title={title}
             aria-label={title}
+            aria-current={isActive ? "page" : undefined}
             onClick={() => {
               dispatch(setSelectedCategory(null));
             }}
@@ -194,7 +199,8 @@ export const UserSidebar = ({ collapsed = false, user: layoutUser }) => {
             <span className="admin-sidebar-icon">{icon}</span>
             <span className="admin-sidebar-label">{title}</span>
           </Link>
-        ))}
+          );
+        })}
       </Stack>
 
       <div className="admin-sidebar-footer">

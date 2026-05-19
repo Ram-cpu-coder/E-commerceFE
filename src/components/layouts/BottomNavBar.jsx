@@ -1,15 +1,17 @@
 import React from "react";
 import {
   FaHome,
-  FaStore,
   FaHeart,
   FaShoppingCart,
   FaSignInAlt,
 } from "react-icons/fa";
+import { MdStorefront } from "react-icons/md";
 import { RiAccountCircleFill } from "react-icons/ri";
 import { Link } from "react-router-dom";
 
 const BottomNavBar = ({ handleCart, user }) => {
+  const isAdminUser = user?.role === "admin" || user?.role === "superadmin";
+
   return (
     <nav
       className="bottom-nav-app fixed-bottom d-flex justify-content-between d-md-none border-top"
@@ -21,9 +23,9 @@ const BottomNavBar = ({ handleCart, user }) => {
           <FaHome size={20} aria-hidden />
           <div>Home</div>
         </Link>
-        <Link to="/shop" className="text-center nav-link py-2">
-          <FaStore size={20} aria-hidden />
-          <div>Shop</div>
+        <Link to="/shop/register" className="text-center nav-link py-2">
+          <MdStorefront size={22} aria-hidden />
+          <div>Sell</div>
         </Link>
       </div>
 
@@ -38,7 +40,7 @@ const BottomNavBar = ({ handleCart, user }) => {
         </button>
       </div>
 
-      <div className="d-flex justify-content-around align-items-center left">
+      <div className="d-flex justify-content-around align-items-center right">
         <Link to="/user/wishlist" className="text-center nav-link py-2">
           <FaHeart size={20} aria-hidden />
           <div>Wishlist</div>
@@ -46,11 +48,11 @@ const BottomNavBar = ({ handleCart, user }) => {
 
         {user?._id ? (
           <Link
-            to={user?.role === "admin" ? "/admin/adminDashboard" : "/user/account"}
+            to={isAdminUser ? "/admin/adminDashboard" : "/user/account"}
             className="text-center nav-link py-2"
           >
             <RiAccountCircleFill size={20} aria-hidden />
-            <div>{user?.role === "admin" ? "Dashboard" : "Account"}</div>
+            <div>{isAdminUser ? "Admin" : "Account"}</div>
           </Link>
         ) : (
           <Link to="/login" className="text-center nav-link py-2">

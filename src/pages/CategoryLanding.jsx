@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import ProductCard from "../components/cards/ProductCard";
-import CategoryBar from "../components/layouts/CategoryBar";
-import CategoryList from "../components/layouts/CategoryList";
 import { useParams, Link } from "react-router-dom";
 import { CiFilter } from "react-icons/ci";
 import { RxReset } from "react-icons/rx";
@@ -22,7 +20,6 @@ const CategoryLanding = () => {
 
   const [sortOrder, setSortOrder] = useState(""); // "" | "asc" | "desc"
   const page = 1;
-  dispatch(setProductCustomerPage(page));
 
   const fetchPublicProducts = async () => {
     if (publicProducts?.docs?.length === 0) {
@@ -31,6 +28,7 @@ const CategoryLanding = () => {
   };
 
   useEffect(() => {
+    dispatch(setProductCustomerPage(page));
     if (Categories.length === 0) {
       dispatch(getAllCategoriesAction());
     }
@@ -46,6 +44,7 @@ const CategoryLanding = () => {
     }
   }, [
     dispatch,
+    page,
     Categories,
     categoryName,
     selectedCategory.categoryName,
@@ -76,9 +75,6 @@ const CategoryLanding = () => {
 
   return (
     <Container fluid className="px-3 px-sm-4">
-      <CategoryBar />
-      <CategoryList />
-
       {/* Header Section */}
       <Row className="pt-3 bg-light">
         <Col md={4}>
@@ -144,10 +140,6 @@ const CategoryLanding = () => {
         )}
       </Row>
 
-      {/* Footer */}
-      <div className="bg-light text-center p-2">
-        <p>See all results</p>
-      </div>
     </Container>
   );
 };

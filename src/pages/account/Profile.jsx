@@ -26,6 +26,7 @@ import {
   IoShieldCheckmarkOutline,
   IoSparklesOutline,
 } from "react-icons/io5";
+import { ImSpinner2 } from "react-icons/im";
 
 const LoginSecurityCard = lazy(() => import("./LoginSecurityCard"));
 const BreadCrumbsAdmin = lazy(() =>
@@ -51,6 +52,7 @@ const Profile = () => {
   const [resendLocked, setResendLocked] = useState(false);
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [profileImagePreview, setProfileImagePreview] = useState("");
+  const [profileImageUploading, setProfileImageUploading] = useState(false);
   const [adminRequestMessage, setAdminRequestMessage] = useState("");
 
   useEffect(() => {
@@ -115,12 +117,17 @@ const Profile = () => {
 
   const handleProfileImageUpdate = async (e) => {
     e.preventDefault();
-    if (!profileImageFile) return;
+    if (!profileImageFile || profileImageUploading) return;
+    setProfileImageUploading(true);
     const formData = new FormData();
     formData.append("image", profileImageFile);
-    const updated = await dispatch(updateUserAction(formData));
-    if (updated) {
-      setProfileImageFile(null);
+    try {
+      const updated = await dispatch(updateUserAction(formData));
+      if (updated) {
+        setProfileImageFile(null);
+      }
+    } finally {
+      setProfileImageUploading(false);
     }
   };
 
@@ -314,6 +321,7 @@ const Profile = () => {
                     id="profileImageFile"
                     type="file"
                     accept="image/png,image/jpeg,image/jpg,image/webp"
+                    disabled={profileImageUploading}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
@@ -321,8 +329,9 @@ const Profile = () => {
                       setProfileImagePreview(URL.createObjectURL(file));
                     }}
                   />
-                  <button type="submit" disabled={!profileImageFile}>
-                    Upload
+                  <button type="submit" disabled={!profileImageFile || profileImageUploading}>
+                    {profileImageUploading && <ImSpinner2 className="profile-upload-spinner" aria-hidden />}
+                    {profileImageUploading ? "Uploading" : "Upload"}
                   </button>
                 </div>
               </form>

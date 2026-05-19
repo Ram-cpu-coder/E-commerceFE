@@ -282,15 +282,6 @@ const SuperAdminPortal = () => {
               placeholder="Search shops by name, admin, email, or status..."
             />
           </div>
-          <Form.Select
-            value={shopForm.status}
-            onChange={(e) =>
-              setShopForm({ ...shopForm, status: e.target.value })
-            }
-            disabled
-          >
-            <option>Super Admin sees every shop</option>
-          </Form.Select>
         </div>
 
         <div className="admin-customers-table-wrap mb-3">

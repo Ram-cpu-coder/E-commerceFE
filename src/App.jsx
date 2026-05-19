@@ -6,6 +6,17 @@ import { fetchCartAction } from "./features/cart/cartAction.js";
 import { autoLogin } from "./features/user/userAction.js";
 import { getWishlistAction } from "./features/wishlist/wishlistAction.js";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+const ScrollToTop = () => {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname, search]);
+
+  return null;
+};
 
 const App = () => {
   const dispatch = useDispatch();
@@ -33,6 +44,7 @@ const App = () => {
 
   return (
     <>
+      <ScrollToTop />
       <AppRoutes />
 
       <ToastContainer

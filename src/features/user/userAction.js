@@ -76,6 +76,7 @@ export const verifyUserAction = ({ sessionId, token }) =>
     });
     const { status, message } = await pending;
     toast[status](message);
+    return { status, message };
   };
 
 // verify email action

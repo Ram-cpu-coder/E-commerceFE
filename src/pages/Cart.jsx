@@ -46,16 +46,14 @@ const Cart = ({ handleCart }) => {
             </p>
           </div>
         </div>
-        {isDrawer && (
-          <button
-            type="button"
-            className="border-0 bg-transparent p-2 rounded-2 text-secondary"
-            onClick={handleCart}
-            aria-label="Close cart"
-          >
-            <RxCross1 className="fs-4" aria-hidden />
-          </button>
-        )}
+        <button
+          type="button"
+          className="border-0 bg-transparent p-2 rounded-2 text-secondary"
+          onClick={isDrawer ? handleCart : () => navigate("/user/account")}
+          aria-label="Close cart"
+        >
+          <RxCross1 className="fs-4" aria-hidden />
+        </button>
       </div>
 
       <div className="cart-content">
