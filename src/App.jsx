@@ -31,7 +31,7 @@ const App = () => {
       // Only call private endpoints when a user has tokens.
       // This avoids extra 401/refresh calls during anonymous first loads.
       const hasAuthToken =
-        sessionStorage.getItem("accessJWT") || localStorage.getItem("refreshJWT");
+        sessionStorage.getItem("accessJWT") || sessionStorage.getItem("refreshJWT");
 
       if (hasAuthToken) {
         dispatch(fetchCartAction());

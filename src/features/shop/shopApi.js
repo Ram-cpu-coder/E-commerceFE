@@ -28,6 +28,7 @@ export const submitShopApplicationApi = (data) =>
     method: "post",
     url: `${shopUrl}/applications`,
     data,
+    isPrivate: true,
   });
 
 export const getShopApplicationsApi = (status = "all") =>

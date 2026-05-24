@@ -91,15 +91,9 @@ const HomePage = () => {
         {/* Products Section */}
         <div className="py-5 w-100 d-flex justify-content-center">
           {productLoading ? (
-            <Backdrop
-              sx={(theme) => ({
-                color: "#fff",
-                zIndex: theme.zIndex.drawer + 1,
-              })}
-              open={true}
-            >
-              <CircularProgress color="inherit" />
-            </Backdrop>
+            <div className="storefront-section d-flex justify-content-center py-5">
+              <CircularProgress size={36} aria-label="Loading products" />
+            </div>
           ) : (
             <div className="d-flex flex-column align-items-center storefront-section mt-4">
               <div className="storefront-section-header">

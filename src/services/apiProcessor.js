@@ -17,7 +17,7 @@ export const clearApiCache = (url) => {
 };
 
 const getAccessJWT = () => sessionStorage.getItem("accessJWT");
-const getRefreshJWT = () => localStorage.getItem("refreshJWT");
+const getRefreshJWT = () => sessionStorage.getItem("refreshJWT");
 
 const getCachedPayload = (url) => {
   const entry = apiCache.get(url);
@@ -29,6 +29,17 @@ const getCachedPayload = (url) => {
   return entry.data;
 };
 
+const buildCacheKey = (url, data) => {
+  if (!data || typeof data !== "object") return url;
+  const params = new URLSearchParams();
+  Object.entries(data)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .forEach(([key, value]) => params.append(key, String(value)));
+  const query = params.toString();
+  return query ? `${url}?${query}` : url;
+};
+
 export const apiProcessor = async ({
   method,
   url,
@@ -38,8 +49,10 @@ export const apiProcessor = async ({
   contentType = "application/json",
   responseType = undefined,
 }) => {
+  const cacheKey = method === "get" ? buildCacheKey(url, data) : url;
+
   if (method === "get" && !isPrivate && !isRefreshToken) {
-    const cached = getCachedPayload(url);
+    const cached = getCachedPayload(cacheKey);
     if (cached !== null) return cached;
   }
 
@@ -58,10 +71,17 @@ export const apiProcessor = async ({
   }
 
   try {
-    const response = await axios({ method, url, data, headers, responseType });
+    const response = await axios({
+      method,
+      url,
+      data: method === "get" ? undefined : data,
+      params: method === "get" ? data : undefined,
+      headers,
+      responseType,
+    });
 
     if (method === "get" && !isPrivate && !isRefreshToken) {
-      apiCache.set(url, { data: response.data, ts: Date.now() });
+      apiCache.set(cacheKey, { data: response.data, ts: Date.now() });
     }
 
     return response.data;
@@ -93,7 +113,7 @@ export const apiProcessor = async ({
           } catch (refreshError) {
             console.warn("Token refresh failed:", refreshError.message);
             sessionStorage.removeItem("accessJWT");
-            localStorage.removeItem("refreshJWT");
+            sessionStorage.removeItem("refreshJWT");
             return null;
           } finally {
             isRefreshing = false;

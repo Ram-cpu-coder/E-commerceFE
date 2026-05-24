@@ -16,11 +16,11 @@ const HotPicks = ({ handleOnClickProduct }) => {
     const fetchHotPicks = async () => {
       await dispatch(getRecommendationsAction(user._id));
     };
-    if (!hotPicks.length) {
+    if (user?._id && !hotPicks.length) {
       fetchHotPicks();
     }
     setLoading(false);
-  }, []);
+  }, [dispatch, hotPicks.length, user?._id]);
 
   if (loading) {
     return (
@@ -32,6 +32,10 @@ const HotPicks = ({ handleOnClickProduct }) => {
       </Backdrop>
     );
   }
+  if (!hotPicks.length) {
+    return null;
+  }
+
   return (
     <div className="w-100 d-flex justify-content-center mt-5">
       <div className="d-flex flex-column align-items-center storefront-section storefront-shell rounded-4 p-3 p-md-4">

@@ -4,61 +4,77 @@ import {
   FaHeart,
   FaShoppingCart,
   FaSignInAlt,
+  FaStore,
 } from "react-icons/fa";
 import { MdStorefront } from "react-icons/md";
 import { RiAccountCircleFill } from "react-icons/ri";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const BottomNavBar = ({ handleCart, user }) => {
   const isAdminUser = user?.role === "admin" || user?.role === "superadmin";
 
   return (
     <nav
-      className="bottom-nav-app fixed-bottom d-flex justify-content-between d-md-none border-top"
-      style={{ height: "70px" }}
+      className="bottom-nav-app fixed-bottom d-md-none"
       aria-label="Mobile navigation"
     >
-      <div className="d-flex justify-content-around align-items-center left gap-0">
-        <Link to="/" className="text-center nav-link py-2">
+      <div className="bottom-nav-group">
+        <NavLink to="/" className="bottom-nav-link nav-link">
           <FaHome size={20} aria-hidden />
-          <div>Home</div>
-        </Link>
-        <Link to="/shop/register" className="text-center nav-link py-2">
-          <MdStorefront size={22} aria-hidden />
-          <div>Sell</div>
-        </Link>
+          <span>Home</span>
+        </NavLink>
+        {user?._id ? (
+          <NavLink to="/shop/register" className="bottom-nav-link nav-link">
+            <MdStorefront size={22} aria-hidden />
+            <span>Sell</span>
+          </NavLink>
+        ) : (
+          <NavLink to="/shop" className="bottom-nav-link nav-link">
+            <FaStore size={20} aria-hidden />
+            <span>Shop</span>
+          </NavLink>
+        )}
       </div>
 
       <div className="fab-container">
         <button
           type="button"
-          className="fab-btn"
+          className="bottom-nav-link bottom-nav-cart"
           onClick={handleCart}
           aria-label="Open shopping cart"
         >
-          <FaShoppingCart size={24} aria-hidden />
+          <span className="bottom-nav-cart-icon">
+            <FaShoppingCart size={22} aria-hidden />
+          </span>
+          <span>Cart</span>
         </button>
       </div>
 
-      <div className="d-flex justify-content-around align-items-center right">
-        <Link to="/user/wishlist" className="text-center nav-link py-2">
+      <div className="bottom-nav-group">
+        <NavLink to="/user/wishlist" className="bottom-nav-link nav-link">
           <FaHeart size={20} aria-hidden />
-          <div>Wishlist</div>
-        </Link>
+          <span>Wishlist</span>
+        </NavLink>
 
         {user?._id ? (
-          <Link
+          <NavLink
             to={isAdminUser ? "/admin/adminDashboard" : "/user/account"}
-            className="text-center nav-link py-2"
+            className="bottom-nav-link nav-link"
           >
-            <RiAccountCircleFill size={20} aria-hidden />
-            <div>{isAdminUser ? "Admin" : "Account"}</div>
-          </Link>
+            {user?.image ? (
+              <span className="bottom-nav-avatar">
+                <img src={user.image} alt={user?.fName || "Account"} />
+              </span>
+            ) : (
+              <RiAccountCircleFill size={20} aria-hidden />
+            )}
+            <span>{isAdminUser ? "Admin" : "Account"}</span>
+          </NavLink>
         ) : (
-          <Link to="/login" className="text-center nav-link py-2">
+          <NavLink to="/login" className="bottom-nav-link nav-link">
             <FaSignInAlt size={20} aria-hidden />
-            <div>Login</div>
-          </Link>
+            <span>Login</span>
+          </NavLink>
         )}
       </div>
     </nav>

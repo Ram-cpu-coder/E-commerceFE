@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import {
   IoArrowForwardOutline,
@@ -8,7 +9,6 @@ import {
   IoCardOutline,
   IoCheckmarkCircleOutline,
   IoLocationOutline,
-  IoLockClosedOutline,
   IoPersonOutline,
   IoStorefrontOutline,
 } from "react-icons/io5";
@@ -19,12 +19,6 @@ const initialForm = {
   description: "",
   businessCategory: "",
   businessType: "registered-business",
-  ownerFirstName: "",
-  ownerLastName: "",
-  ownerEmail: "",
-  ownerPhone: "",
-  password: "",
-  confirmPassword: "",
   contactEmail: "",
   phone: "",
   address: "",
@@ -74,6 +68,7 @@ const currencyOptions = [
 ];
 
 const ShopRegister = () => {
+  const { user } = useSelector((state) => state.userInfo);
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -81,11 +76,6 @@ const ShopRegister = () => {
   const completion = useMemo(() => {
     const required = [
       "shopName",
-      "ownerFirstName",
-      "ownerLastName",
-      "ownerEmail",
-      "ownerPhone",
-      "password",
       "address",
       "payoutAccountName",
       "payoutAccountEmail",
@@ -104,22 +94,21 @@ const ShopRegister = () => {
 
   const submitApplication = async (e) => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) {
-      toast.error("Passwords do not match.");
+    if (!user?._id) {
+      toast.error("Please log in before registering a shop.");
       return;
     }
-    if (form.password.length < 8) {
-      toast.error("Password must be at least 8 characters.");
+    if (user.role === "admin" || user.role === "superadmin") {
+      toast.error("This account already has elevated access.");
       return;
     }
 
     setSubmitting(true);
     const payload = {
       ...form,
-      contactEmail: form.contactEmail || form.ownerEmail,
-      phone: form.phone || form.ownerPhone,
+      contactEmail: form.contactEmail || user.email,
+      phone: form.phone || user.phone,
     };
-    delete payload.confirmPassword;
 
     const result = await submitShopApplicationApi(payload);
     setSubmitting(false);
@@ -228,31 +217,26 @@ const ShopRegister = () => {
             <IoPersonOutline aria-hidden />
             <span>Owner account</span>
           </div>
-          <div className="shop-form-grid">
-            <Form.Group>
-              <Form.Label>Owner first name</Form.Label>
-              <Form.Control name="ownerFirstName" value={form.ownerFirstName} onChange={updateField} placeholder="First name" required />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Owner last name</Form.Label>
-              <Form.Control name="ownerLastName" value={form.ownerLastName} onChange={updateField} placeholder="Last name" required />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Owner email</Form.Label>
-              <Form.Control type="email" name="ownerEmail" value={form.ownerEmail} onChange={updateField} placeholder="owner@shop.com" required />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Owner phone</Form.Label>
-              <Form.Control name="ownerPhone" value={form.ownerPhone} onChange={updateField} placeholder="+61 400 000 000" required />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Password</Form.Label>
-              <Form.Control type="password" name="password" value={form.password} onChange={updateField} placeholder="Create an 8+ character password" required />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Confirm password</Form.Label>
-              <Form.Control type="password" name="confirmPassword" value={form.confirmPassword} onChange={updateField} placeholder="Re-enter the password" required />
-            </Form.Group>
+          <div className="shop-owner-account-card">
+            <span className="shop-owner-avatar">
+              {user?.image ? (
+                <img src={user.image} alt={user?.fName || "Owner"} />
+              ) : (
+                <IoPersonOutline aria-hidden />
+              )}
+            </span>
+            <div className="shop-owner-copy">
+              <div className="shop-owner-heading">
+                <strong>
+                  {[user?.fName, user?.lName].filter(Boolean).join(" ") ||
+                    "Logged in account"}
+                </strong>
+                <small>{user?.email || "Email unavailable"}</small>
+              </div>
+              <p>
+                This account becomes the Shop Admin after Super Admin approval.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -335,7 +319,7 @@ const ShopRegister = () => {
         </div>
 
         <div className="shop-form-submit">
-          <span><IoLockClosedOutline aria-hidden /> Reviewed before activation</span>
+          <span><IoCheckmarkCircleOutline aria-hidden /> Reviewed before activation</span>
           <Button type="submit" disabled={submitting}>
             {submitting ? "Submitting..." : "Submit shop registration"}
           </Button>

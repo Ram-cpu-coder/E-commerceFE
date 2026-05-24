@@ -92,15 +92,17 @@ const SmartDashboard = ({ smartDashboard, setSmartDashboard }) => {
             >
               {msg.type === "text" ? (
                 <div
-                  dangerouslySetInnerHTML={{ __html: msg.text }}
-                  style={{ fontSize: "14px" }}
-                />
+                  style={{ fontSize: "14px", whiteSpace: "pre-wrap" }}
+                >
+                  {msg.text}
+                </div>
               ) : msg.type === "chart" ? (
                 <div style={{ maxWidth: "100%" }}>
                   <div
-                    dangerouslySetInnerHTML={{ __html: msg.explanation }}
-                    style={{ fontSize: "14px", marginBottom: "10px" }}
-                  />
+                    style={{ fontSize: "14px", marginBottom: "10px", whiteSpace: "pre-wrap" }}
+                  >
+                    {msg.explanation}
+                  </div>
                   <MyChart
                     type={msg.chartType}
                     labels={msg.labels}

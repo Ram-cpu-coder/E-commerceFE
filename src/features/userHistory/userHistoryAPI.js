@@ -6,7 +6,8 @@ export const getRecommendationsApi = (data) => {
     return apiProcessor({
         method: "get",
         url: URL + "/recommendation",
-        data: data
+        data: data,
+        isPrivate: Boolean(data?.userId)
     })
 }
 
@@ -14,6 +15,7 @@ export const createUserHistory = (data) => {
     return apiProcessor({
         method: "post",
         url: URL,
-        data: data
+        data: data,
+        isPrivate: Boolean(data?.userId)
     })
 }

@@ -34,8 +34,9 @@ export const loginAction = (form, navigate, redirectTo = "/") => async (dispatch
   if (status == "success") {
     //upddate storage session for access token
     sessionStorage.setItem("accessJWT", accessToken);
-    // update local storage for refresh token
-    localStorage.setItem("refreshJWT", refreshToken);
+    // keep the refresh token session-scoped instead of persisting it indefinitely
+    sessionStorage.setItem("refreshJWT", refreshToken);
+    localStorage.removeItem("refreshJWT");
     //update the store
     await dispatch(setUser(userInfo));
     await dispatch(fetchUserAction())
@@ -151,7 +152,7 @@ export const fetchUserAction = () => async (dispatch) => {
   } catch (error) {
     if (error.message === "jwt expired") {
       sessionStorage.removeItem("accessJWT");
-      localStorage.removeItem("refreshJWT");
+      sessionStorage.removeItem("refreshJWT");
     }
     toast.error("Session expired, please login again");
   }
@@ -181,7 +182,8 @@ export const getAdminUsersPastWeekTimeFrameAction = (startTime, endTime) => asyn
 // auto login action
 export const autoLogin = () => async (dispatch) => {
   const accessToken = sessionStorage.getItem("accessJWT");
-  const refreshToken = localStorage.getItem("refreshJWT");
+  const refreshToken = sessionStorage.getItem("refreshJWT");
+  localStorage.removeItem("refreshJWT");
 
   try {
     // when access token available
@@ -201,7 +203,7 @@ export const autoLogin = () => async (dispatch) => {
   } catch {
     //remove tokens in case if autologin fail
     sessionStorage.removeItem("accessJWT");
-    localStorage.removeItem("refreshJWT");
+    sessionStorage.removeItem("refreshJWT");
     toast.error("Session expired, please login again");
   }
 };
@@ -215,7 +217,7 @@ export const logoutAction = () => async (dispatch) => {
     })
     const { status, message } = await pending;
     if (status === "success") {
-      localStorage.removeItem("refreshJWT");
+      sessionStorage.removeItem("refreshJWT");
       sessionStorage.removeItem("accessJWT")
       await dispatch(resetUser());
       toast[status](message)

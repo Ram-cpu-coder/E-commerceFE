@@ -71,7 +71,7 @@ const UpdateFeatureBanner = lazy(
 );
 
 const hasStoredAuth = () =>
-  Boolean(sessionStorage.getItem("accessJWT") || localStorage.getItem("refreshJWT"));
+  Boolean(sessionStorage.getItem("accessJWT") || sessionStorage.getItem("refreshJWT"));
 
 const ProtectedRoutes = ({ children }) => {
   const location = useLocation();
@@ -133,7 +133,7 @@ const AppRoutes = () => {
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/shop/register" element={<ShopRegister />} />
+          <Route path="/shop/register" element={<ProtectedRoutes><ShopRegister /></ProtectedRoutes>} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgetpassword" element={<ForgetPassword />} />

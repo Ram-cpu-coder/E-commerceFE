@@ -84,8 +84,8 @@ export const refreshTokenApi = async () => {
       isRefreshToken: true,
     });
   } catch (error) {
-    sessionStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    sessionStorage.removeItem("accessJWT");
+    sessionStorage.removeItem("refreshJWT");
     throw error;
   }
 };
